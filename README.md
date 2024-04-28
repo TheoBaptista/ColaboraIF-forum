@@ -1,6 +1,6 @@
-# ColaboraIF Virtual Forum
+# ColaboraIF Forum
 
-O ColaboraIF Virtual Forum é uma plataforma de fórum virtual desenvolvida para promover a colaboração e a interação entre os membros da comunidade acadêmica do Instituto Federal do Rio Grande do Sul (IFRS). Esta aplicação permite aos usuários participar de discussões, fazer perguntas, compartilhar conhecimento e colaborar em projetos de forma eficiente e intuitiva.
+O ColaboraIF Forum é uma plataforma de fórum virtual desenvolvida para promover a colaboração e a interação entre os membros da comunidade acadêmica do Instituto Federal do Rio Grande do Sul (IFRS). Esta aplicação permite aos usuários participar de discussões, fazer perguntas, compartilhar conhecimento e colaborar em projetos de forma eficiente e intuitiva.
 
 ## Autores
 
