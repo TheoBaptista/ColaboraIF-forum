@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { QuestionFormComponent } from './features/questions/question-form/question-form.component';
 import { QuestionListComponent } from './features/questions/question-list/question-list.component';
+import { QuestionDetailComponent } from './features/questions/question-detail/question-detail.component';
 
 export const routes: Routes = [
   {
@@ -13,7 +14,10 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: '/form',
+    redirectTo: '/list',
     pathMatch: 'full',
+  },
+  { path: 'question/:id', 
+    component: QuestionDetailComponent 
   },
 ];

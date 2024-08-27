@@ -1,4 +1,3 @@
-/* Estilo para o contêiner que centraliza o formulário */
 .wrapper {
   display: flex;
   justify-content: center;
@@ -6,13 +5,12 @@
   height: 100vh;
 }
 
-/* Estilo para o cartão do formulário */
 .question-form {
   display: flex;
   flex-direction: column;
-  align-items: stretch; /* Ajusta para ocupar toda a largura disponível */
+  align-items: stretch;
   width: 100%;
-  max-width: 600px; /* Largura máxima do formulário */
+  max-width: 600px;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
@@ -29,54 +27,50 @@
   gap: 10px;
 }
 
-/* Estilo para campos de formulário */
 .mat-form-field {
-  width: 100%; /* Faz o campo ocupar toda a largura do contêiner */
-  margin-bottom: 16px; /* Espaço entre campos */
+  width: 100%;
+  margin-bottom: 16px;
 }
 
-/* Estilo para os botões */
 .botoes {
   display: flex;
-  justify-content: space-between; /* Distribui os botões igualmente */
-  margin-top: 20px; /* Espaçamento superior */
+  justify-content: space-between; 
+  margin-top: 20px; 
 }
 
 .botoes button {
-  width: 48%; /* Cada botão ocupa 48% da largura disponível */
+  width: 48%;
 }
 
-/* Estilo para telas menores */
 @media (max-width: 768px) {
   .wrapper {
-    padding: 0 10px; /* Reduz o espaçamento lateral em telas menores */
+    padding: 0 10px;
   }
 
   .question-form {
     padding: 15px;
     width: 100%;
-    max-width: 100%; /* Faz o formulário ocupar toda a largura disponível */
+    max-width: 100%;
   }
 
   .botoes {
-    flex-direction: column; /* Alinha os botões em pilha */
-    align-items: center; /* Centraliza os botões */
+    flex-direction: column; 
+    align-items: center;
   }
 
   .botoes button {
-    width: 100%; /* Botões ocupam toda a largura em telas menores */
-    margin-bottom: 10px; /* Espaço entre os botões */
+    width: 100%; 
+    margin-bottom: 10px; 
   }
 
-  /* Ajusta o tamanho da fonte dos campos e labels para telas menores */
   .mat-form-field .mat-label,
   .mat-form-field input,
   .mat-form-field textarea {
-    font-size: 14px; /* Diminui o tamanho da fonte */
+    font-size: 14px;
   }
 
   .question-form h1 {
-    font-size: 20px; /* Diminui o tamanho do título */
-    text-align: center; /* Centraliza o título */
+    font-size: 20px;
+    text-align: center;
   }
 }

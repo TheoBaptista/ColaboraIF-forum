@@ -1,1 +1,25 @@
-<p>question-detail works!</p>
+<div class="question-detail-container">
+  <mat-card *ngIf="question" class="question-card">
+    <mat-card-header>
+      <mat-card-title>{{ question.title }}</mat-card-title>
+      <mat-card-subtitle>Categoria: {{ question.category }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p><strong>Tópico:</strong> {{ question.topic }}</p>
+      <p><strong>Usuário:</strong> {{ question.username }}</p>
+      <p>{{ question.content }}</p>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="answers-section" *ngIf="question?.answers?.length">
+    <h3>Respostas:</h3>
+    <mat-card *ngFor="let answer of question?.answers" class="answer-card">
+      <mat-card-content>
+        <p><strong>Resposta:</strong></p>
+        <p>{{ answer.content }}</p>
+        <p><strong>Usuário:</strong> {{ answer.username }}</p>
+        <p><strong>Correto:</strong> {{ answer.is_correct_answer ? 'Sim' : 'Não' }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
