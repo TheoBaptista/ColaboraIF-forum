@@ -10,11 +10,13 @@ import {
 } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
+import { FormsModule } from '@angular/forms';
+import { debounceTime, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-question-list',
   standalone: true,
-  imports: [MatButtonModule, MatCardModule, CommonModule, MatFormFieldModule, MatInputModule, MatIconModule],
+  imports: [MatButtonModule, MatCardModule, CommonModule, MatFormFieldModule, MatInputModule, MatIconModule, FormsModule],
   templateUrl: './question-list.component.html',
   styleUrl: './question-list.component.css',
 })
@@ -22,6 +24,8 @@ export class QuestionListComponent {
   questions: QuestionResponse[] = [];
   questionHavesCorrectAnswer = false;
   questionsResponseCount = 0;
+  searchTerm: string = ''; 
+  searchSubject: Subject<string> = new Subject(); 
 
   constructor(
     private router: Router,
@@ -29,6 +33,17 @@ export class QuestionListComponent {
   ) {}
 
   ngOnInit() {
+    this.loadQuestions();
+
+    this.searchSubject.pipe(
+      debounceTime(300)
+    ).subscribe(searchTerm => {
+      this.searchQuestions(searchTerm);
+    });
+
+  }
+
+  loadQuestions() {
     this.questionService.listQuestions().subscribe({
       next: (data: QuestionResponse[]) => {
         this.questions = this.initializeAnswers(data);
@@ -58,5 +73,25 @@ export class QuestionListComponent {
       ...question,
       answers: question.answers ?? [],
     }));
+  }
+
+  onSearchInputChange() {
+    this.searchSubject.next(this.searchTerm);
+  }
+
+
+  searchQuestions(searchTerm: string) {
+    if (this.searchTerm.length < 3) {
+      return;
+    }
+
+    this.questionService.searchQuestions(this.searchTerm).subscribe({
+      next: (data: QuestionResponse[]) => {
+        this.questions = this.initializeAnswers(data);
+      },
+      error: (err) => {
+        console.error('Erro ao buscar as questões', err);
+      },
+    });
   }
 }

@@ -40,10 +40,6 @@
   margin-bottom: 15px;
 }
 
-.question-details {
-  align-self: self-end;
-}
-
 .search-container {
   display: flex;
   align-items: center;
@@ -55,15 +51,15 @@
 
 mat-form-field {
   width: 100%;
-  max-width: 300px;
+  max-width: 800px;
   padding-top: 25px;
 }
 
 .search-button {
   width: 100%;
-  max-width: 200px;
+  max-width: 150px;
   height: 50px;
-  border-radius: 15px;
+  border-radius: 50px;
 }
 
 .custom-button-color {
@@ -72,7 +68,17 @@ mat-form-field {
 }
 
 .custom-button-color:hover {
-  background-color: #a8d4a4 !important;
+  background-color: #b9c9c1 !important;
+}
+
+.clickable-card {
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.clickable-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 @media (max-width: 768px) {
@@ -104,10 +110,5 @@ mat-form-field {
     width: 100%;
     max-width: 100%;
     height: 40px;
-  }
-
-  .question-details {
-    align-self: center;
-    margin-top: 8px;
   }
 }

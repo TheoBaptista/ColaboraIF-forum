@@ -23,4 +23,8 @@ export class QuestionService {
   getQuestionById(id: string): Observable<QuestionResponse> {
     return this.http.get<QuestionResponse>(`${this.baseUrl}/questions/${id}`);
   }
+
+  searchQuestions(query: string): Observable<QuestionResponse[]> {
+    return this.http.get<QuestionResponse[]>(`${this.baseUrl}/questions/search?q=${query}`);
+  }
 }

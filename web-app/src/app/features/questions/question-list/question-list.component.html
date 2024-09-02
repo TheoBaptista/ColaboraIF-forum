@@ -2,15 +2,27 @@
   <div class="search-container">
     <mat-form-field appearance="outline">
       <mat-label>Pesquisar</mat-label>
-      <input matInput placeholder="Digite sua pesquisa" />
+      <input
+        matInput
+        placeholder="Digite sua pesquisa"
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchInputChange()" />
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
-    <button class="search-button custom-button-color" mat-raised-button (click)="goToQuestionForm()">
-      Inserir Nova Pergunta
+    <button
+      class="search-button custom-button-color"
+      mat-raised-button
+      (click)="goToQuestionForm()"
+    >
+      Inserir Pergunta
     </button>
   </div>
   <div class="question-list">
-    <mat-card *ngFor="let question of questions" class="question-card">
+    <mat-card
+      *ngFor="let question of questions"
+      class="question-card clickable-card" 
+      (click)="viewQuestionDetails(question.id)"
+    >
       <mat-card-header>
         <mat-card-title>{{ question.title }}</mat-card-title>
         <mat-card-subtitle
@@ -31,11 +43,6 @@
           </p>
         </div>
       </mat-card-content>
-      <mat-card-actions class="question-details">
-        <button class="custom-no-hover" mat-button (click)="viewQuestionDetails(question.id)">
-          Ver Detalhes
-        </button>
-      </mat-card-actions>
     </mat-card>
   </div>
 </div>
