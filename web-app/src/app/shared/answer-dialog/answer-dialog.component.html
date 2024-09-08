@@ -1,0 +1,13 @@
+<div class="dialog-container">
+  <h2 mat-dialog-title>Responder à Pergunta</h2>
+  <mat-dialog-content>
+    <mat-form-field appearance="fill" class="textarea-field">
+      <mat-label>Sua resposta</mat-label>
+      <textarea matInput [(ngModel)]="answerContent"></textarea>
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button (click)="onCancel()">Cancelar</button>
+    <button mat-button (click)="onSubmit()" [disabled]="isSubmitDisabled">Enviar</button>
+  </mat-dialog-actions>
+</div>

@@ -1,0 +1,60 @@
+/* Estilização geral da modal */
+::ng-deep .mat-dialog-container {
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    padding: 16px;
+  }
+  
+  /* Título da modal */
+  .mat-dialog-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  /* Conteúdo da modal */
+  .mat-dialog-content {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 20px;
+  }
+  
+  /* Ações da modal (botões) */
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  
+  /* Estilização do botão de cancelar */
+  .cancel-button {
+    background-color: #f5f5f5;
+    color: #757575;
+    border-radius: 4px;
+    padding: 8px 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .cancel-button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  /* Estilização do botão de confirmar */
+  .confirm-button {
+    background-color: #d32f2f;
+    color: white;
+    border-radius: 4px;
+    padding: 8px 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .confirm-button:hover {
+    background-color: #c62828;
+  }
+  
+  /* Estilização geral dos botões */
+  button.mat-button {
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+  

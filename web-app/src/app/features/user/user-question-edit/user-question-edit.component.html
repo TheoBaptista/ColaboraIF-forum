@@ -1,0 +1,36 @@
+<div class="wrapper">
+  <mat-card class="question-form">
+    <h1 class="title">Edite Sua Pergunta</h1>
+
+    <form class="items" [formGroup]="questionForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="outline">
+        <mat-label>Título</mat-label>
+        <input matInput formControlName="title" placeholder="Digite o título da sua pergunta" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Categoria</mat-label>
+        <mat-select formControlName="category">
+          <mat-option *ngFor="let category of categories" [value]="category">
+            {{ category }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Tópico</mat-label>
+        <input matInput formControlName="topic" placeholder="Digite o tópico relacionado" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Descrição</mat-label>
+        <textarea matInput formControlName="description" placeholder="Digite a descrição relacionada"></textarea>
+      </mat-form-field>
+
+      <div class="botoes">
+        <button mat-button type="button" color="primary" (click)="onCancel()">Cancelar</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="questionForm.invalid">Salvar</button>
+      </div>
+    </form>
+  </mat-card>
+</div>

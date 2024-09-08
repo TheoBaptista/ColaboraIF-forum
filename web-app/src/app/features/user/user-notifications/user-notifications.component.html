@@ -1,1 +1,11 @@
-<p>user-notifications works!</p>
+<div class="notifications" *ngIf="notifications.length === 0">
+    <h2>Nenhuma notificação no momento.</h2>
+  </div>
+  <div class="answers-section" *ngIf="notifications.length > 0">
+    <h2>Notificações:</h2>
+    <mat-card *ngFor="let notification of notifications" class="answer-card clickable-card" (click)="onNotificationClick(notification)">
+        <mat-card-content>
+         <h3>{{ notification.message }}</h3>
+        </mat-card-content>
+    </mat-card>
+  </div>

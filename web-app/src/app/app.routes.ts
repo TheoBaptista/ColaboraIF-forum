@@ -6,6 +6,7 @@ import { UserAdvancedSearchComponent } from './features/user/user-advanced-searc
 import { UserNotificationsComponent } from './features/user/user-notifications/user-notifications.component';
 import { UserQuestionsFavoritesComponent } from './features/user/user-questions-favorites/user-questions-favorites.component';
 import { UserQuestionsComponent } from './features/user/user-questions/user-questions.component';
+import { UserQuestionEditComponent } from './features/user/user-question-edit/user-question-edit.component';
 
 export const routes: Routes = [
   {
@@ -28,6 +29,10 @@ export const routes: Routes = [
   {
     path: 'user/questions',
     component: UserQuestionsComponent,
+  },
+  {
+    path: 'user/edit-question/:id',
+    component: UserQuestionEditComponent,
   },
   {
     path: 'user/questions-favorites',

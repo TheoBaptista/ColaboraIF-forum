@@ -9,16 +9,27 @@
       <p><strong>Usuário:</strong> {{ question.username }}</p>
       <p>{{ question.content }}</p>
     </mat-card-content>
+    <mat-card-actions class="card-actions">
+      <button mat-icon-button (click)="openAnswerDialog()">
+        <mat-icon>textsms</mat-icon>
+      </button>
+      <button mat-icon-button>
+        <mat-icon>bookmark_border</mat-icon> 
+        <!-- <mat-icon>bookmark</mat-icon>  -->
+      </button>
+    </mat-card-actions>
   </mat-card>
 
   <div class="answers-section" *ngIf="question?.answers?.length">
     <h3>Respostas:</h3>
     <mat-card *ngFor="let answer of question?.answers" class="answer-card">
       <mat-card-content>
-        <p><strong>Resposta:</strong></p>
-        <p>{{ answer.content }}</p>
+        <p><strong>Resposta: </strong>{{ answer.content }}</p>
         <p><strong>Usuário:</strong> {{ answer.username }}</p>
-        <p><strong>Correto:</strong> {{ answer.is_correct_answer ? 'Sim' : 'Não' }}</p>
+        <p>
+          <strong>Correto:</strong>
+          {{ answer.is_correct_answer ? "Sim" : "Não" }}
+        </p>
       </mat-card-content>
     </mat-card>
   </div>

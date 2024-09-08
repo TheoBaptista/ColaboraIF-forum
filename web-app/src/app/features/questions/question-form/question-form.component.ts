@@ -1,5 +1,11 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,6 +14,7 @@ import { CommonModule } from '@angular/common';
 import { QuestionService } from '../../../core/services/question.service';
 import { Question } from '../../../core/models/question.model';
 import { Router } from '@angular/router';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-question-form',
@@ -21,15 +28,21 @@ import { Router } from '@angular/router';
     MatCardModule,
     CommonModule,
     FormsModule,
-    ReactiveFormsModule
-  ]
+    ReactiveFormsModule,
+    MatSnackBarModule,
+  ],
 })
 export class QuestionFormComponent {
   questionForm: FormGroup;
 
   categories = ['Frontend', 'Backend', 'DevOps', 'Data Science'];
 
-  constructor(private fb: FormBuilder, private questionService: QuestionService, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private questionService: QuestionService,
+    private router: Router,
+    private snackBar: MatSnackBar
+  ) {
     this.questionForm = this.fb.group({
       title: ['', Validators.required],
       category: ['', Validators.required],
@@ -46,15 +59,34 @@ export class QuestionFormComponent {
         topic: this.questionForm.value.topic,
         category: this.questionForm.value.category,
         user_id: 'user123',
-        username: 'João' 
+        username: 'João',
       };
 
       this.questionService.createQuestion(formData).subscribe({
-        next: response => {
+        next: (response) => {
           console.log('Pergunta enviada com sucesso:', response);
+          this.snackBar.open('Pergunta criada com sucesso!', 'Fechar', {
+            duration: 3000,
+            panelClass: ['custom-snackbar'],
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+          });
           this.router.navigate(['/list']);
         },
-        error: error => console.error('Erro ao enviar pergunta:', error),
+        error: (err) => {
+          console.error('Erro ao criar a pergunta', err);
+          this.snackBar.open(
+            'Erro ao atualizar a pergunta. Tente novamente.',
+            'Fechar',
+            {
+              duration: 3000,
+              panelClass: ['custom-snackbar'],
+              horizontalPosition: 'center',
+              verticalPosition: 'bottom',
+            }
+          );
+          this.router.navigate(['/list']);
+        },
       });
     }
   }

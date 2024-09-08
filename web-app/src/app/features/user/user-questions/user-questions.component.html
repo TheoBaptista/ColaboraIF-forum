@@ -1,1 +1,26 @@
-<p>user-questions works!</p>
+<div class="question-list">
+  <mat-card *ngFor="let question of questions" class="question-card">
+    <mat-card-header>
+      <mat-card-title>{{ question.title }}</mat-card-title>
+      <mat-card-subtitle>Categoria: {{ question.category }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="question-content">
+        <p>{{ question.content }}</p>
+        <p><strong>Tópico:</strong> {{ question.topic }}</p>
+        <p><strong>Usuário:</strong> {{ question.username }}</p>
+      </div>
+      <div class="question-info">
+        <p><strong>Respostas:</strong> {{ question.answers.length || 0 }}</p>
+        <p>
+          <strong>Solucionado:</strong>
+          {{ questionHavesCorrectAnswer ? "Sim" : "Não" }}
+        </p>
+      </div>
+    </mat-card-content>
+    <mat-card-actions class="question-actions">
+      <button mat-raised-button (click)="editQuestion(question.id)">Editar</button>
+      <button mat-raised-button color="warn" (click)="confirmDelete(question)">Excluir</button>
+      </mat-card-actions>
+  </mat-card>
+</div>
