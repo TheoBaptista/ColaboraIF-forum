@@ -8,12 +8,12 @@
 
 .question-card {
   width: 100%;
-  max-width: 400px; 
-  min-width: 300px; 
-  margin: 8px; 
+  max-width: 400px;
+  min-width: 300px;
+  margin: 8px;
   background-color: #b9eeb5;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
-  border-radius: 8px; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
 }
 
 .question-actions {

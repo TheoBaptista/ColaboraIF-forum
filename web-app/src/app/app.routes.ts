@@ -22,9 +22,9 @@ export const routes: Routes = [
     redirectTo: '/list',
     pathMatch: 'full',
   },
-  { 
-    path: 'question/:id', 
-    component: QuestionDetailComponent 
+  {
+    path: 'question/:id',
+    component: QuestionDetailComponent,
   },
   {
     path: 'user/questions',

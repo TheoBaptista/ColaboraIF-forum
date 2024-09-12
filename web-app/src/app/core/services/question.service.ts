@@ -46,15 +46,20 @@ export class QuestionService {
 
   getUserNotifications(userId: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/notifications`, {
-      params: { userId }
+      params: { userId },
     });
   }
 
   deleteNotification(notificationId: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/notifications/${notificationId}`);
+    return this.http.delete<void>(
+      `${this.baseUrl}/notifications/${notificationId}`
+    );
   }
 
   addAnswer(questionId: string, answer: any): Observable<Answer> {
-    return this.http.post<Answer>(`${this.baseUrl}/questions/${questionId}/answers`, answer);
+    return this.http.post<Answer>(
+      `${this.baseUrl}/questions/${questionId}/answers`,
+      answer
+    );
   }
 }

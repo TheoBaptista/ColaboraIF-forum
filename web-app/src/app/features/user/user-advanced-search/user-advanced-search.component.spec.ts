@@ -8,10 +8,9 @@ describe('UserAdvancedSearchComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UserAdvancedSearchComponent]
-    })
-    .compileComponents();
-    
+      imports: [UserAdvancedSearchComponent],
+    }).compileComponents();
+
     fixture = TestBed.createComponent(UserAdvancedSearchComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

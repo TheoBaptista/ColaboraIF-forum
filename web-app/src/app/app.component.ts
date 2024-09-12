@@ -4,11 +4,22 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
-import { MatDrawer, MatDrawerMode, MatSidenavModule } from '@angular/material/sidenav';
+import {
+  MatDrawer,
+  MatDrawerMode,
+  MatSidenavModule,
+} from '@angular/material/sidenav';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { isPlatformBrowser } from '@angular/common';
-import { Component, Inject, PLATFORM_ID, HostListener, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  Inject,
+  PLATFORM_ID,
+  HostListener,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -22,7 +33,7 @@ import { Component, Inject, PLATFORM_ID, HostListener, OnInit, ViewChild } from 
     MatIconModule,
     FormsModule,
     RouterModule,
-    MatToolbarModule
+    MatToolbarModule,
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
@@ -37,9 +48,12 @@ export class AppComponent implements OnInit {
   canGoBack = false;
 
   @ViewChild('drawer') drawer!: MatDrawer;
-  
-  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object) {
-    this.router.events.subscribe(event => {
+
+  constructor(
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.showDrawer = this.router.url !== '/login';
         this.adjustForMobile();
@@ -75,20 +89,20 @@ export class AppComponent implements OnInit {
 
   goBack() {
     if (isPlatformBrowser(this.platformId)) {
-      window.history.back(); 
+      window.history.back();
+    }
   }
-}
 
   updateNavigationState() {
     if (isPlatformBrowser(this.platformId)) {
       this.canGoBack = this.router.url !== '/list';
       console.log('canGoBack:', this.canGoBack);
+    }
   }
-}
 
-closeDrawer() {
-  if (this.drawer.mode === 'over' || this.drawer.opened) {
-    this.drawer.close();
+  closeDrawer() {
+    if (this.drawer.mode === 'over' || this.drawer.opened) {
+      this.drawer.close();
+    }
   }
-}
 }

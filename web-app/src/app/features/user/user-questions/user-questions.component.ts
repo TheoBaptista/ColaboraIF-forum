@@ -17,7 +17,7 @@ import { MatButtonModule } from '@angular/material/button';
     MatButtonModule,
     MatDialogModule,
     CommonModule,
-    MatSnackBarModule
+    MatSnackBarModule,
   ],
   templateUrl: './user-questions.component.html',
   styleUrl: './user-questions.component.css',
@@ -30,9 +30,8 @@ export class UserQuestionsComponent implements OnInit {
     private questionService: QuestionService,
     private dialog: MatDialog,
     private router: Router,
-    private snackBar: MatSnackBar
-  ) //private authService: AuthService
-  {}
+    private snackBar: MatSnackBar //private authService: AuthService
+  ) {}
 
   ngOnInit() {
     //const userId = this.authService.getUserId();
@@ -67,9 +66,13 @@ export class UserQuestionsComponent implements OnInit {
 
   confirmDelete(question: QuestionResponse): void {
     if (question.answers.length > 0) {
-      this.snackBar.open('Esta pergunta não pode ser excluída, pois já possui respostas.', 'Fechar', {
-        duration: 3000,
-      });
+      this.snackBar.open(
+        'Esta pergunta não pode ser excluída, pois já possui respostas.',
+        'Fechar',
+        {
+          duration: 3000,
+        }
+      );
       return;
     }
 
@@ -85,7 +88,7 @@ export class UserQuestionsComponent implements OnInit {
   deleteQuestion(questionId: string): void {
     this.questionService.deleteQuestion(questionId).subscribe({
       next: () => {
-        this.questions = this.questions.filter(q => q.id !== questionId);
+        this.questions = this.questions.filter((q) => q.id !== questionId);
         this.snackBar.open('Pergunta excluída com sucesso.', 'Fechar', {
           duration: 3000,
         });
@@ -94,7 +97,7 @@ export class UserQuestionsComponent implements OnInit {
         this.snackBar.open('Erro ao excluir a pergunta.', 'Fechar', {
           duration: 3000,
         });
-      }
+      },
     });
   }
 

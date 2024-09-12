@@ -1,1 +1,74 @@
-<p>user-advanced-search works!</p>
+<div class="wrapper">
+  <mat-card class="advanced-search-card">
+    <h1 class="advanced-search-title">Pesquisa Avançada</h1>
+
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+      <mat-form-field appearance="fill">
+        <mat-label>Título ou Descrição</mat-label>
+        <input
+          matInput
+          placeholder="Digite o que deseja buscar"
+          formControlName="titleOrDescription"
+        />
+        <mat-error
+          *ngIf="searchForm.get('titleOrDescription')?.hasError('required')"
+        >
+          Este campo é obrigatório.
+        </mat-error>
+        <mat-error
+          *ngIf="searchForm.get('titleOrDescription')?.hasError('minlength')"
+        >
+          O campo precisa ter no mínimo 3 caracteres.
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Tópico</mat-label>
+        <input
+          matInput
+          placeholder="Digite um tópico que deseja buscar"
+          formControlName="topic"
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Categoria</mat-label>
+        <mat-select formControlName="category">
+          <mat-option value="">Todas</mat-option>
+          <mat-option value="Back-end">Back-end</mat-option>
+          <mat-option value="Front-end">Front-end</mat-option>
+          <mat-option value="DevOps">DevOps</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Com Respostas</mat-label>
+        <mat-select formControlName="hasAnswers">
+          <mat-option value="">Todas</mat-option>
+          <mat-option [value]="true">Sim</mat-option>
+          <mat-option [value]="false">Não</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Pergunta com solução</mat-label>
+        <mat-select formControlName="isSolved">
+          <mat-option value="">Todas</mat-option>
+          <mat-option [value]="true">Sim</mat-option>
+          <mat-option [value]="false">Não</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="button-container">
+        <button
+          mat-raised-button
+          type="submit"
+          color="primary"
+          [disabled]="!isValid()"
+        >
+          Pesquisar
+        </button>
+      </div>
+    </form>
+  </mat-card>
+</div>

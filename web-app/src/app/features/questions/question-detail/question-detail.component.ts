@@ -13,9 +13,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 @Component({
   selector: 'app-question-detail',
   standalone: true,
-  imports: [MatCardModule, MatButtonModule, MatIconModule, CommonModule, MatFormFieldModule],
+  imports: [
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    CommonModule,
+    MatFormFieldModule,
+  ],
   templateUrl: './question-detail.component.html',
-  styleUrls: ['./question-detail.component.css']
+  styleUrls: ['./question-detail.component.css'],
 })
 export class QuestionDetailComponent {
   question: QuestionResponse | null = null;
@@ -26,7 +32,7 @@ export class QuestionDetailComponent {
     private questionService: QuestionService,
     private dialog: MatDialog
   ) {}
-  
+
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -36,7 +42,7 @@ export class QuestionDetailComponent {
         },
         error: (err) => {
           console.error('Erro ao carregar os detalhes da questão', err);
-        }
+        },
       });
     }
   }
@@ -44,13 +50,13 @@ export class QuestionDetailComponent {
   openAnswerDialog(): void {
     const dialogRef = this.dialog.open(AnswerDialogComponent, {
       width: '400px',
-      panelClass: 'custom-dialog-container'
+      panelClass: 'custom-dialog-container',
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         console.log('Resposta enviada:', result);
-        this.addAnswer(result); 
+        this.addAnswer(result);
       }
     });
   }
@@ -65,25 +71,23 @@ export class QuestionDetailComponent {
       content: answerContent,
       is_correct_answer: false,
       user_id: '12345',
-      username: 'Maria'
+      username: 'Maria',
     };
 
     const questionId = this.question?.id;
-    
+
     if (questionId) {
       this.questionService.addAnswer(questionId, newAnswer).subscribe({
         next: (response) => {
-          
           if (this.question) {
             this.question.answers.push(response);
           }
-          this.newAnswerContent = '';  
+          this.newAnswerContent = '';
         },
         error: (err) => {
           console.error('Erro ao adicionar a resposta', err);
-        }
+        },
       });
     }
   }
-
 }

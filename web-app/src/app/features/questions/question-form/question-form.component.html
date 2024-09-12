@@ -3,12 +3,16 @@
     <h1 class="title">Faça Sua Pergunta</h1>
 
     <form class="items" [formGroup]="questionForm" (ngSubmit)="onSubmit()">
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="fill">
         <mat-label>Título</mat-label>
-        <input matInput formControlName="title" placeholder="Digite o título da sua pergunta" />
+        <input
+          matInput
+          formControlName="title"
+          placeholder="Digite o título da sua pergunta"
+        />
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="fill">
         <mat-label>Categoria</mat-label>
         <mat-select formControlName="category">
           <mat-option *ngFor="let category of categories" [value]="category">
@@ -17,19 +21,36 @@
         </mat-select>
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="fill">
         <mat-label>Tópico</mat-label>
-        <input matInput formControlName="topic" placeholder="Digite o tópico relacionado" />
+        <input
+          matInput
+          formControlName="topic"
+          placeholder="Digite o tópico relacionado"
+        />
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="fill">
         <mat-label>Descrição</mat-label>
-        <textarea matInput formControlName="description" placeholder="Digite a descrição relacionada"></textarea>
+        <textarea
+          matInput
+          formControlName="description"
+          placeholder="Digite a descrição relacionada"
+        ></textarea>
       </mat-form-field>
 
       <div class="botoes">
-        <button mat-button color="primary" type="button" (click)="onCancel()">Cancelar</button>
-        <button mat-raised-button color="primary" type="submit" [disabled]="questionForm.invalid">Enviar</button>
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="questionForm.invalid"
+        >
+          Enviar
+        </button>
+        <button mat-button color="primary" type="button" (click)="onCancel()">
+          Cancelar
+        </button>
       </div>
     </form>
   </mat-card>

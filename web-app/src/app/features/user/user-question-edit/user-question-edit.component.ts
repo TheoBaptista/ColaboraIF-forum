@@ -1,5 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { QuestionService } from '../../../core/services/question.service';
 import { QuestionResponse } from '../../../core/models/question.model';
@@ -85,18 +91,22 @@ export class UserQuestionEditComponent implements OnInit {
                 duration: 3000,
                 panelClass: ['custom-snackbar'],
                 horizontalPosition: 'center',
-                verticalPosition: 'bottom'
+                verticalPosition: 'bottom',
               });
               this.router.navigate(['/user/questions']);
             },
             error: (err) => {
               console.error('Erro ao atualizar a questão', err);
-              this.snackBar.open('Erro ao atualizar a pergunta. Tente novamente.', 'Fechar', {
-                duration: 3000,
-                panelClass: ['custom-snackbar'],
-                horizontalPosition: 'center',
-                verticalPosition: 'bottom'
-              });
+              this.snackBar.open(
+                'Erro ao atualizar a pergunta. Tente novamente.',
+                'Fechar',
+                {
+                  duration: 3000,
+                  panelClass: ['custom-snackbar'],
+                  horizontalPosition: 'center',
+                  verticalPosition: 'bottom',
+                }
+              );
               this.router.navigate(['/user/questions']);
             },
           });

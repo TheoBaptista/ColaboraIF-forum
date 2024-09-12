@@ -5,7 +5,11 @@
     <form class="items" [formGroup]="questionForm" (ngSubmit)="onSubmit()">
       <mat-form-field appearance="outline">
         <mat-label>Título</mat-label>
-        <input matInput formControlName="title" placeholder="Digite o título da sua pergunta" />
+        <input
+          matInput
+          formControlName="title"
+          placeholder="Digite o título da sua pergunta"
+        />
       </mat-form-field>
 
       <mat-form-field appearance="outline">
@@ -19,17 +23,34 @@
 
       <mat-form-field appearance="outline">
         <mat-label>Tópico</mat-label>
-        <input matInput formControlName="topic" placeholder="Digite o tópico relacionado" />
+        <input
+          matInput
+          formControlName="topic"
+          placeholder="Digite o tópico relacionado"
+        />
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Descrição</mat-label>
-        <textarea matInput formControlName="description" placeholder="Digite a descrição relacionada"></textarea>
+        <textarea
+          matInput
+          formControlName="description"
+          placeholder="Digite a descrição relacionada"
+        ></textarea>
       </mat-form-field>
 
       <div class="botoes">
-        <button mat-button type="button" color="primary" (click)="onCancel()">Cancelar</button>
-        <button mat-raised-button color="primary" type="submit" [disabled]="questionForm.invalid">Salvar</button>
+        <button mat-button type="button" color="primary" (click)="onCancel()">
+          Cancelar
+        </button>
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="questionForm.invalid"
+        >
+          Salvar
+        </button>
       </div>
     </form>
   </mat-card>
