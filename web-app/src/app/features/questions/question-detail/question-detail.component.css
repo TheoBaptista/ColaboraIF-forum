@@ -21,14 +21,32 @@
   gap: 8px;
 }
 
+.answer-card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.answer-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
 .answer-card {
   background-color: #8aa09581;
-  margin-bottom: 8px;
+  margin-bottom: 15px;
   max-width: 800px;
   width: 100%;
-  padding: 16px;
+  padding: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 16px;
+}
+
+.answer-card-info{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .answers-section {
@@ -37,6 +55,22 @@
   gap: 12px;
   margin-top: 16px;
   width: 100%;
+}
+
+.answer-card-content div {
+  margin-right: 10px;
+}
+
+.answer-card-content p {
+  margin: 5px 0;
+}
+
+.mat-card-content {
+  font-size: 14px;
+}
+
+.question-card {
+  margin-bottom: 20px;
 }
 
 .answers-section h3 {

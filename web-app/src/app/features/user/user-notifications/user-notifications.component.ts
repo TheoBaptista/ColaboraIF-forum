@@ -20,7 +20,7 @@ export class UserNotificationsComponent {
   ) {}
 
   ngOnInit(): void {
-    const userId = 'user789';
+    const userId = 'user123';
 
     this.questionService.getUserNotifications(userId).subscribe(
       (data) => {

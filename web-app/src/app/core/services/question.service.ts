@@ -62,4 +62,24 @@ export class QuestionService {
       answer
     );
   }
+  markAnswerAsCorrect(questionId: string, answerId: string, userId: string) {
+    return this.http.patch(`${this.baseUrl}/questions/${questionId}/answers/${answerId}/correct`, { userId });
+  }
+
+  addFavorite(userId: string, questionId: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/favorite-questions`, { userId, questionId });
+  }
+
+  removeFavorite(userId: string, questionId: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/favorite-questions`, { params: { userId, questionId } });
+  }
+
+  getFavoriteQuestionsInfo(userId: string): Observable<string[]> {
+    return this.http.get<string[]>(`${this.baseUrl}/favorite-questions`, { params: { userId } });
+  }
+
+  getFavoriteQuestionsOfUser(userId: string) {
+    return this.http.get<QuestionResponse[]>(`${this.baseUrl}/user/favorite-questions?userId=${userId}`);
+  }
+
 }

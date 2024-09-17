@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { QuestionService } from '../../../core/services/question.service';
 import { Answer, QuestionResponse } from '../../../core/models/question.model';
@@ -26,6 +26,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 export class QuestionDetailComponent {
   question: QuestionResponse | null = null;
   newAnswerContent: string = '';
+  questions = [];
+  favoriteQuestions: string[] = [];
+  userId = 'user123';
+
 
   constructor(
     private route: ActivatedRoute,
@@ -34,8 +38,12 @@ export class QuestionDetailComponent {
   ) {}
 
   ngOnInit() {
+
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
+
+      this.loadFavoriteQuestions();
+
       this.questionService.getQuestionById(id).subscribe({
         next: (data: QuestionResponse) => {
           this.question = data;
@@ -43,6 +51,32 @@ export class QuestionDetailComponent {
         error: (err) => {
           console.error('Erro ao carregar os detalhes da questão', err);
         },
+      });
+
+     
+    }
+  }
+
+  loadFavoriteQuestions() {
+    this.questionService.getFavoriteQuestionsInfo(this.userId).subscribe((favorites) => {
+      this.favoriteQuestions = favorites;
+    });
+  }
+
+  isFavorite(questionId: string): boolean {
+    return this.favoriteQuestions.includes(questionId);
+  }
+
+  toggleFavorite(questionId: string) {
+    if (this.isFavorite(questionId)) {
+      // Se já é favorito, remove
+      this.questionService.removeFavorite(this.userId, questionId).subscribe(() => {
+        this.favoriteQuestions = this.favoriteQuestions.filter(id => id !== questionId);
+      });
+    } else {
+      // Se não é favorito, adiciona
+      this.questionService.addFavorite(this.userId, questionId).subscribe(() => {
+        this.favoriteQuestions.push(questionId);
       });
     }
   }
@@ -89,5 +123,36 @@ export class QuestionDetailComponent {
         },
       });
     }
+  }
+
+  isQuestionOwner(): boolean {
+    const loggedUserId = this.getLoggedUserId();
+    return this.question?.user_id === loggedUserId;
+  }
+
+  markAnswerAsCorrect(answerId: string) {
+    const userId = this.getLoggedUserId();
+    const questionId = this.question?.id;
+
+    if (!questionId || !userId) {
+      return;
+    }
+
+    this.questionService
+      .markAnswerAsCorrect(questionId, answerId, userId)
+      .subscribe({
+        next: (updatedAnswer) => {
+          this.question?.answers.forEach((answer) => {
+            answer.is_correct_answer = answer.id === answerId;
+          });
+        },
+        error: (err) => {
+          console.error('Erro ao marcar a resposta como correta', err);
+        },
+      });
+  }
+
+  getLoggedUserId(): string | null {
+    return 'user789';
   }
 }

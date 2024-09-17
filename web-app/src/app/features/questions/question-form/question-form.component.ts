@@ -91,6 +91,10 @@ export class QuestionFormComponent {
     }
   }
 
+  isValid(): boolean {
+    return this.questionForm.valid;
+  }
+
   onCancel() {
     this.router.navigate(['/list']);
   }

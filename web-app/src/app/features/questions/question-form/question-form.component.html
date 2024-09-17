@@ -10,6 +10,9 @@
           formControlName="title"
           placeholder="Digite o título da sua pergunta"
         />
+        <mat-error *ngIf="questionForm.get('title')?.hasError('required')">
+          Este campo é obrigatório.
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="fill">
@@ -19,6 +22,9 @@
             {{ category }}
           </mat-option>
         </mat-select>
+        <mat-error *ngIf="questionForm.get('category')?.hasError('required')">
+          Este campo é obrigatório.
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="fill">
@@ -28,6 +34,9 @@
           formControlName="topic"
           placeholder="Digite o tópico relacionado"
         />
+        <mat-error *ngIf="questionForm.get('topic')?.hasError('required')">
+          Este campo é obrigatório.
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="fill">
@@ -37,6 +46,9 @@
           formControlName="description"
           placeholder="Digite a descrição relacionada"
         ></textarea>
+        <mat-error *ngIf="questionForm.get('description')?.hasError('required')">
+          Este campo é obrigatório.
+        </mat-error>
       </mat-form-field>
 
       <div class="botoes">
