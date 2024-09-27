@@ -9,11 +9,13 @@ import { UserQuestionsComponent } from './features/user/user-questions/user-ques
 import { UserQuestionEditComponent } from './features/user/user-question-edit/user-question-edit.component';
 import { AuthenticationComponent } from './features/authentication/authentication.component';
 import { LayoutComponent } from './shared/layout/layout.component';
+import { AuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
     path: '',
     component: LayoutComponent,
+    canActivate: [AuthGuard],
     children: [
       { path: '', redirectTo: 'list', pathMatch: 'full' },
       { path: 'list', component: QuestionListComponent },
