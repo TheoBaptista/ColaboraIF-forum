@@ -33,6 +33,7 @@ export class AuthenticationComponent implements OnInit {
     this.authService.login(idToken).subscribe({
       next: (data: any) => {
         this.authService.saveToken(data.token);
+        this.authService.saveUserInfo(data.user);
         this.ngZone.run(() => {
           this.router.navigate(['/list']);
         });
