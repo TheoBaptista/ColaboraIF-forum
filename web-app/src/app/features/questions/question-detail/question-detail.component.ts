@@ -1,5 +1,5 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { QuestionService } from '../../../core/services/question.service';
 import { Answer, QuestionResponse } from '../../../core/models/question.model';
 import { MatCardModule } from '@angular/material/card';
@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { AnswerDialogComponent } from '../../../shared/answer-dialog/answer-dialog.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { AuthorizationService } from '../../../core/services/authorization.service';
 
 @Component({
   selector: 'app-question-detail',
@@ -28,20 +29,25 @@ export class QuestionDetailComponent {
   newAnswerContent: string = '';
   questions = [];
   favoriteQuestions: string[] = [];
-  userId = 'user123';
-
+  user: any = null;
 
   constructor(
     private route: ActivatedRoute,
     private questionService: QuestionService,
-    private dialog: MatDialog
-  ) {}
+    private dialog: MatDialog,
+    private authService: AuthorizationService,
+    private router: Router
+  ) {
+    this.user = this.authService.getUserInfo();
+    if (!this.user) {
+      this.router.navigate(['/login']);
+      return;
+    }
+  }
 
   ngOnInit() {
-
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-
       this.loadFavoriteQuestions();
 
       this.questionService.getQuestionById(id).subscribe({
@@ -52,15 +58,15 @@ export class QuestionDetailComponent {
           console.error('Erro ao carregar os detalhes da questão', err);
         },
       });
-
-     
     }
   }
 
   loadFavoriteQuestions() {
-    this.questionService.getFavoriteQuestionsInfo(this.userId).subscribe((favorites) => {
-      this.favoriteQuestions = favorites;
-    });
+    this.questionService
+      .getFavoriteQuestionsInfo(this.user.id)
+      .subscribe((favorites) => {
+        this.favoriteQuestions = favorites;
+      });
   }
 
   isFavorite(questionId: string): boolean {
@@ -69,15 +75,21 @@ export class QuestionDetailComponent {
 
   toggleFavorite(questionId: string) {
     if (this.isFavorite(questionId)) {
-      // Se já é favorito, remove
-      this.questionService.removeFavorite(this.userId, questionId).subscribe(() => {
-        this.favoriteQuestions = this.favoriteQuestions.filter(id => id !== questionId);
-      });
+      
+      this.questionService
+        .removeFavorite(this.user.id, questionId)
+        .subscribe(() => {
+          this.favoriteQuestions = this.favoriteQuestions.filter(
+            (id) => id !== questionId
+          );
+        });
     } else {
-      // Se não é favorito, adiciona
-      this.questionService.addFavorite(this.userId, questionId).subscribe(() => {
-        this.favoriteQuestions.push(questionId);
-      });
+      
+      this.questionService
+        .addFavorite(this.user.id, questionId)
+        .subscribe(() => {
+          this.favoriteQuestions.push(questionId);
+        });
     }
   }
 
@@ -104,8 +116,8 @@ export class QuestionDetailComponent {
       id: '',
       content: answerContent,
       is_correct_answer: false,
-      user_id: '12345',
-      username: 'Maria',
+      user_id: this.user.id,
+      username: this.user.name,
     };
 
     const questionId = this.question?.id;
@@ -153,6 +165,6 @@ export class QuestionDetailComponent {
   }
 
   getLoggedUserId(): string | null {
-    return 'user789';
+    return  this.user.id;
   }
 }

@@ -6,37 +6,40 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { QuestionResponse } from '../../../core/models/question.model';
 import { Router } from '@angular/router';
+import { LineClampDirective } from '../../../shared/directives/line-clamp.directive';
+import { AuthorizationService } from '../../../core/services/authorization.service';
 
 @Component({
   selector: 'app-user-questions-favorites',
   standalone: true,
-  imports: [MatCardModule, CommonModule, MatInputModule, MatIconModule],
+  imports: [MatCardModule, CommonModule, MatInputModule, MatIconModule, LineClampDirective],
   templateUrl: './user-questions-favorites.component.html',
   styleUrl: './user-questions-favorites.component.css',
 })
 export class UserQuestionsFavoritesComponent {
   questions: QuestionResponse[] = [];
-  questionHavesCorrectAnswer = false;
 
   constructor(
     private router: Router,
-    private questionService: QuestionService
+    private questionService: QuestionService,
+    private authService: AuthorizationService
   ) {}
 
   ngOnInit() {
-    const userId = 'user123';
-    this.loadQuestionsFavoriteByUser(userId);
+    const user = this.authService.getUserInfo();
+
+    if (!user) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.loadQuestionsFavoriteByUser(user.id);
   }
 
   loadQuestionsFavoriteByUser(userId: string) {
     this.questionService.getFavoriteQuestionsOfUser(userId).subscribe({
       next: (data: QuestionResponse[]) => {
         this.questions = this.initializeAnswers(data);
-        this.questionHavesCorrectAnswer = this.questions.some(
-          (question) =>
-            Array.isArray(question.answers) &&
-            question.answers.some((answer) => answer?.is_correct_answer)
-        );
       },
 
       error: (err) => {
@@ -50,6 +53,10 @@ export class UserQuestionsFavoritesComponent {
       ...question,
       answers: question.answers ?? [],
     }));
+  }
+
+  hasCorrectAnswer(question: any): boolean {
+    return question.answers.length > 0 && question.answers.some((answer: any) => answer.is_correct_answer);
   }
 
   viewQuestionDetails(id: string) {

@@ -19,6 +19,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { AuthorizationService } from '../../core/services/authorization.service';
 
 @Component({
   selector: 'app-layout',
@@ -50,7 +51,8 @@ export class LayoutComponent {
   constructor(
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object,
-    private ngZone: NgZone 
+    private ngZone: NgZone,
+    private authorizationService: AuthorizationService
   ) {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
@@ -94,6 +96,17 @@ export class LayoutComponent {
         window.history.back();
       });
     }
+  }
+
+  getUserInfo() {
+    const user = this.authorizationService.getUserInfo();
+    
+    if (!user) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    return user.name;
   }
 
   updateNavigationState() {

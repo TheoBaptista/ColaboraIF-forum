@@ -8,6 +8,8 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog/confirm-dialog.component';
 import { MatButtonModule } from '@angular/material/button';
+import { LineClampDirective } from '../../../shared/directives/line-clamp.directive';
+import { AuthorizationService } from '../../../core/services/authorization.service';
 
 @Component({
   selector: 'app-user-questions',
@@ -18,37 +20,37 @@ import { MatButtonModule } from '@angular/material/button';
     MatDialogModule,
     CommonModule,
     MatSnackBarModule,
+    LineClampDirective
   ],
   templateUrl: './user-questions.component.html',
   styleUrl: './user-questions.component.css',
 })
 export class UserQuestionsComponent implements OnInit {
   questions: QuestionResponse[] = [];
-  questionHavesCorrectAnswer = false;
-
+ 
   constructor(
     private questionService: QuestionService,
     private dialog: MatDialog,
     private router: Router,
-    private snackBar: MatSnackBar //private authService: AuthService
+    private snackBar: MatSnackBar,
+    private authService: AuthorizationService
   ) {}
 
   ngOnInit() {
-    //const userId = this.authService.getUserId();
+    const user = this.authService.getUserInfo();
 
-    const userId = 'user123';
-    this.loadQuestions(userId);
+    if (!user) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.loadQuestions(user.id);
   }
 
   loadQuestions(userId: string) {
     this.questionService.getUserQuestions(userId).subscribe({
       next: (data: QuestionResponse[]) => {
         this.questions = this.initializeAnswers(data);
-        this.questionHavesCorrectAnswer = this.questions.some(
-          (question) =>
-            Array.isArray(question.answers) &&
-            question.answers.some((answer) => answer?.is_correct_answer)
-        );
       },
 
       error: (err) => {
@@ -99,6 +101,14 @@ export class UserQuestionsComponent implements OnInit {
         });
       },
     });
+  }
+
+  createNewQuestion(): void {
+    this.router.navigate(['/form']);
+  }
+
+  hasCorrectAnswer(question: any): boolean {
+    return question.answers.length > 0 && question.answers.some((answer: any) => answer.is_correct_answer);
   }
 
   editQuestion(questionId: string): void {

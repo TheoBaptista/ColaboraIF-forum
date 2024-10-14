@@ -47,6 +47,34 @@
   margin-bottom: 15px;
 }
 
+.no-questions {
+  text-align: center;
+  padding: 40px;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.no-questions h2 {
+  font-size: 24px;
+  color: #333;
+}
+
+.no-questions p {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.no-questions button {
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 20px;
+  background-color: #00796b;
+  color: white;
+}
+
 @media (max-width: 768px) {
   .question-list {
     padding: 8px;

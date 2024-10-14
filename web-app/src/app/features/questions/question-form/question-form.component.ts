@@ -15,6 +15,7 @@ import { QuestionService } from '../../../core/services/question.service';
 import { Question } from '../../../core/models/question.model';
 import { Router } from '@angular/router';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { AuthorizationService } from '../../../core/services/authorization.service';
 
 @Component({
   selector: 'app-question-form',
@@ -35,13 +36,16 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 export class QuestionFormComponent {
   questionForm: FormGroup;
 
+  user: any = null;
+
   categories = ['Frontend', 'Backend', 'DevOps', 'Data Science'];
 
   constructor(
     private fb: FormBuilder,
     private questionService: QuestionService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private authService: AuthorizationService
   ) {
     this.questionForm = this.fb.group({
       title: ['', Validators.required],
@@ -49,6 +53,12 @@ export class QuestionFormComponent {
       topic: ['', Validators.required],
       description: ['', Validators.required],
     });
+
+    this.user = this.authService.getUserInfo();
+    if (!this.user) {
+      this.router.navigate(['/login']);
+      return;
+    }
   }
 
   onSubmit() {
@@ -58,8 +68,8 @@ export class QuestionFormComponent {
         content: this.questionForm.value.description,
         topic: this.questionForm.value.topic,
         category: this.questionForm.value.category,
-        user_id: 'user123',
-        username: 'João',
+        user_id: this.user.id,
+        username: this.user.name,
       };
 
       this.questionService.createQuestion(formData).subscribe({
