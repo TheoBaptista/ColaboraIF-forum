@@ -65,6 +65,10 @@
           <mat-icon>arrow_back</mat-icon>
         </button>
         <span class="user-name hide-on-mobile">Olá {{ getUserInfo() }}</span>
+
+        <button mat-icon-button (click)="logout()">
+          <mat-icon>logout</mat-icon>
+        </button>
       </div>
     </mat-toolbar>
     <div class="content">

@@ -10,6 +10,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { AnswerDialogComponent } from '../../../shared/answer-dialog/answer-dialog.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { AuthorizationService } from '../../../core/services/authorization.service';
+import { MarkdownModule } from 'ngx-markdown';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-question-detail',
@@ -20,6 +22,7 @@ import { AuthorizationService } from '../../../core/services/authorization.servi
     MatIconModule,
     CommonModule,
     MatFormFieldModule,
+    MarkdownModule
   ],
   templateUrl: './question-detail.component.html',
   styleUrls: ['./question-detail.component.css'],
@@ -36,7 +39,8 @@ export class QuestionDetailComponent {
     private questionService: QuestionService,
     private dialog: MatDialog,
     private authService: AuthorizationService,
-    private router: Router
+    private router: Router,
+    private sanitizer: DomSanitizer
   ) {
     this.user = this.authService.getUserInfo();
     if (!this.user) {
@@ -59,6 +63,17 @@ export class QuestionDetailComponent {
         },
       });
     }
+  }
+
+  processContent(content: string): SafeHtml {
+    if (!content) {
+      return '';
+    }
+  
+    const codeRegex = /```([\s\S]*?)```/g;
+    const sanitizedContent = content.replace(codeRegex, '<div class="code-container" style="background-color: #2e2e2e !important; max-width: 600px !important;   background-color: #2e2e2e !important; color: #ff7f50 !important; padding: 16px !important; border-radius: 4px !important; overflow-x: auto !important;"><pre><code>$1</code></pre></div>');
+  
+    return this.sanitizer.bypassSecurityTrustHtml(sanitizedContent);
   }
 
   loadFavoriteQuestions() {
@@ -113,7 +128,6 @@ export class QuestionDetailComponent {
     }
 
     const newAnswer: Answer = {
-      id: '',
       content: answerContent,
       is_correct_answer: false,
       user_id: this.user.id,

@@ -40,8 +40,10 @@
       </mat-form-field>
 
       <mat-form-field appearance="fill">
-        <mat-label>Descrição</mat-label>
+        
+        <mat-label>Descrição</mat-label>        
         <textarea
+          class="description"
           matInput
           formControlName="description"
           placeholder="Digite a descrição relacionada"
@@ -49,6 +51,7 @@
         <mat-error *ngIf="questionForm.get('description')?.hasError('required')">
           Este campo é obrigatório.
         </mat-error>
+        <button mat-button type="button" (click)="insertCodeSnippet()">Inserir Código</button>
       </mat-form-field>
 
       <div class="botoes">

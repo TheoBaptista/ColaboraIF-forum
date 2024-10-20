@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { QuestionService } from '../../../core/services/question.service';
-import { Answer, Question, QuestionResponse } from '../../../core/models/question.model';
+import { QuestionResponse } from '../../../core/models/question.model';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import {
@@ -25,7 +25,10 @@ export class QuestionListComponent {
   questions: QuestionResponse[] = [];
   questionsResponseCount = 0;
   searchTerm: string = ''; 
-  searchSubject: Subject<string> = new Subject(); 
+  searchSubject: Subject<string> = new Subject();
+  filteredQuestions: QuestionResponse[] = [];
+  categories: string[] = [];
+  selectedCategory: string = 'Todas as perguntas';
 
   constructor(
     private router: Router,
@@ -34,6 +37,7 @@ export class QuestionListComponent {
 
   ngOnInit() {
     this.loadQuestions();
+    this.loadCategories();
 
     this.searchSubject.pipe(
       debounceTime(300)
@@ -47,13 +51,32 @@ export class QuestionListComponent {
     this.questionService.listQuestions().subscribe({
       next: (data: QuestionResponse[]) => {
         this.questions = this.initializeAnswers(data);
+        this.filteredQuestions = this.initializeAnswers(data);
       },
-
-
       error: (err) => {
         console.error('Erro ao carregar a lista de questões', err);
       },
     });
+  }
+
+  loadCategories() {
+    this.questionService.getCategories().subscribe({
+      next: (categories: any[]) => {
+        this.categories = ['Todas as perguntas', ...categories];
+      },
+      error: (err) => {
+        console.error('Erro ao carregar as categorias', err);
+      },
+    });
+  }
+
+  filterByCategory(category: string) {
+    this.selectedCategory = category;
+    if (category === 'Todas as perguntas') {
+      this.filteredQuestions = [...this.questions];
+    } else {
+      this.filteredQuestions = this.questions.filter(q => q.category === category); 
+    }
   }
 
   goToQuestionForm() {

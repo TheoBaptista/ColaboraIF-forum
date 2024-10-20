@@ -38,8 +38,8 @@ export class QuestionFormComponent {
 
   user: any = null;
 
-  categories = ['Frontend', 'Backend', 'DevOps', 'Data Science'];
-
+  categories: string[] = [];
+  
   constructor(
     private fb: FormBuilder,
     private questionService: QuestionService,
@@ -59,6 +59,30 @@ export class QuestionFormComponent {
       this.router.navigate(['/login']);
       return;
     }
+  }
+
+  ngOnInit(): void {
+    
+    this.questionService.getCategories().subscribe({
+      next: (data: string[]) => {
+        this.categories = data;
+      },
+      error: (err) => {
+        console.error('Erro ao carregar categorias', err);
+        this.snackBar.open('Erro ao carregar categorias', 'Fechar', {
+          duration: 3000,
+          panelClass: ['custom-snackbar'],
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom',
+        });
+      }
+    });
+  }
+
+  insertCodeSnippet() {
+    const currentDescription = this.questionForm.get('description')?.value || '';
+    const codeSnippet = '```\n// Seu código aqui\n```';
+    this.questionForm.get('description')?.setValue(currentDescription + '\n' + codeSnippet);
   }
 
   onSubmit() {

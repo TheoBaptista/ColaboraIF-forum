@@ -50,6 +50,11 @@
   bottom: 20px !important;
 }
 
+.description {
+  min-height: 100px; 
+  resize: vertical; 
+}
+
 @media (max-width: 768px) {
   .wrapper {
     padding: 0 10px;

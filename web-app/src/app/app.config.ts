@@ -8,6 +8,7 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { SocialAuthServiceConfig} from '@abacritt/angularx-social-login';
 import { GoogleLoginProvider } from '@abacritt/angularx-social-login';
 import { authTokenInterceptor } from './core/interceptors/auth-token.interceptor';
+import { MarkdownModule } from 'ngx-markdown';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -15,6 +16,7 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(),
     provideAnimationsAsync(),
     provideHttpClient(withFetch(), withInterceptors([authTokenInterceptor])),
-    provideAnimationsAsync()
+    provideAnimationsAsync(),
+    ...(MarkdownModule.forRoot().providers || [])
   ],
 };

@@ -22,9 +22,13 @@ export class AuthenticationComponent implements OnInit {
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
-      (window as any)['loginGoogle'] = this.handleGoogleLogin.bind(this);
-      console.log('Função loginGoogle registrada.');
+      this.registerGoogleLoginCallback();
     }
+  }
+
+  registerGoogleLoginCallback(): void {
+    window.loginGoogle = (response: any) => this.handleGoogleLogin(response);
+    console.log('Função loginGoogle registrada no escopo global.');
   }
 
   handleGoogleLogin(response: any) {

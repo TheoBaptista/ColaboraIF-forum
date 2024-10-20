@@ -98,6 +98,10 @@ export class LayoutComponent {
     }
   }
 
+  logout() {
+    this.authorizationService.logout();
+  }
+
   getUserInfo() {
     const user = this.authorizationService.getUserInfo();
     

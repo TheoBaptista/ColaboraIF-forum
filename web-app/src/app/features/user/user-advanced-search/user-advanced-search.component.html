@@ -34,11 +34,13 @@
       <mat-form-field appearance="fill">
         <mat-label>Categoria</mat-label>
         <mat-select formControlName="category">
-          <mat-option value="">Todas</mat-option>
-          <mat-option value="Back-end">Back-end</mat-option>
-          <mat-option value="Front-end">Front-end</mat-option>
-          <mat-option value="DevOps">DevOps</mat-option>
+          <mat-option *ngFor="let category of categories" [value]="category">
+            {{ category }}
+          </mat-option>
         </mat-select>
+        <mat-error *ngIf="searchForm.get('category')?.hasError('required')">
+          Este campo é obrigatório.
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="fill">

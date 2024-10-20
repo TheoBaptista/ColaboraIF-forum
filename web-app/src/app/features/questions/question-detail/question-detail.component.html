@@ -7,7 +7,8 @@
     <mat-card-content class="question-card-content">
       <p><strong>Tópico:</strong> {{ question.topic }}</p>
       <p><strong>Usuário:</strong> {{ question.username }}</p>
-      <p>{{ question.content }}</p>
+      <p><strong>Descrição:</strong></p>
+      <div [innerHTML]="processContent(question.content)"></div>
     </mat-card-content>
     <mat-card-actions class="card-actions">
       <button mat-icon-button (click)="openAnswerDialog()">
@@ -33,7 +34,7 @@
         <div class="answer-card-actions">
           <button
             mat-icon-button
-            *ngIf="isQuestionOwner()"
+            *ngIf="isQuestionOwner() && answer.id"
             (click)="markAnswerAsCorrect(answer.id)"
           >
             <mat-icon>{{

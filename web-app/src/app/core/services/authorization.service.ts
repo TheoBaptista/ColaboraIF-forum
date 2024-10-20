@@ -52,7 +52,9 @@ export class AuthorizationService {
     if (typeof window !== 'undefined' && window.localStorage) {
       localStorage.removeItem(this.tokenKey);
       localStorage.removeItem(this.userKey);
-      this.router.navigate(['/login']);
+      this.router.navigate(['/login']).then(() => {
+        window.location.reload();
+      });
     }
   }
 
