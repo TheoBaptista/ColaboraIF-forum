@@ -86,4 +86,8 @@ export class QuestionService {
     return this.http.get<string[]>(`${this.baseUrl}/categories`);
   }
 
+  getTopics(): Observable<any> {
+    return this.http.get<string[]>(`${this.baseUrl}/topics`);
+  }
+
 }

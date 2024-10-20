@@ -30,7 +30,7 @@ import { AuthorizationService } from '../../../core/services/authorization.servi
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    MatSnackBarModule,
+    MatSnackBarModule
   ],
 })
 export class QuestionFormComponent {
@@ -39,6 +39,9 @@ export class QuestionFormComponent {
   user: any = null;
 
   categories: string[] = [];
+
+  allTopics: string[] = [];
+  filteredTopics: string[] = []; 
   
   constructor(
     private fb: FormBuilder,
@@ -77,6 +80,33 @@ export class QuestionFormComponent {
         });
       }
     });
+
+    this.questionService.getTopics().subscribe({
+      next: (topics: string[]) => {
+        this.allTopics = topics;
+      },
+      error: (err) => {
+        console.error('Erro ao carregar tópicos', err);
+      }
+    });
+  }
+
+  onTopicInput(event: any): void {
+    const value = event.target.value;
+
+    if (value.length < 3) {
+        this.filteredTopics = [];
+        return; 
+    }
+
+    this.filteredTopics = this.allTopics.filter(topic =>
+        topic.toLowerCase().includes(value.toLowerCase())
+    );
+  }
+
+  selectTopic(topic: string): void {
+    this.questionForm.patchValue({ topic });
+    this.filteredTopics = [];
   }
 
   insertCodeSnippet() {
