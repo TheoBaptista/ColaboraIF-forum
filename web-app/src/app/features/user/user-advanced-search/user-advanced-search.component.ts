@@ -12,6 +12,8 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { QuestionService } from '../../../core/services/question.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-user-advanced-search',
@@ -31,14 +33,33 @@ import { MatSelectModule } from '@angular/material/select';
 })
 export class UserAdvancedSearchComponent {
   searchForm: FormGroup;
+  categories: string[] = [];
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private questionService: QuestionService,  private snackBar: MatSnackBar) {
     this.searchForm = this.fb.group({
       titleOrDescription: ['', [Validators.required, Validators.minLength(3)]], // Required validation
       topic: [''],
-      category: [''],
+      category: ['', Validators.required],
       hasAnswers: [''],
       isSolved: [''],
+    });
+  }
+
+  ngOnInit(): void {
+    
+    this.questionService.getCategories().subscribe({
+      next: (data: string[]) => {
+        this.categories = ['Todas as categorias', ...data];
+      },
+      error: (err) => {
+        console.error('Erro ao carregar categorias', err);
+        this.snackBar.open('Erro ao carregar categorias', 'Fechar', {
+          duration: 3000,
+          panelClass: ['custom-snackbar'],
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom',
+        });
+      }
     });
   }
 

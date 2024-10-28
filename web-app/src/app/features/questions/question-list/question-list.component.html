@@ -17,29 +17,40 @@
       Inserir Pergunta
     </button>
   </div>
+
+  <div class="category-buttons">
+    <button
+      *ngFor="let category of categories"
+      mat-raised-button
+      class="category-button"
+      (click)="filterByCategory(category)"      
+    >
+      {{ category }}
+    </button>
+  </div>
+
   <div class="question-list">
     <mat-card
-      *ngFor="let question of questions"
+      *ngFor="let question of filteredQuestions"
       class="question-card clickable-card" 
       (click)="viewQuestionDetails(question.id)"
     >
       <mat-card-header>
-        <mat-card-title>{{ question.title }}</mat-card-title>
+        <mat-card-title [appLineClamp]="1">{{ question.title }}</mat-card-title>
         <mat-card-subtitle
           >Categoria: {{ question.category }}</mat-card-subtitle
         >
       </mat-card-header>
       <mat-card-content>
         <div class="question-content">
-          <p>{{ question.content }}</p>
-          <p><strong>Tópico:</strong> {{ question.topic }}</p>
+          <p [appLineClamp]="1"><strong>Tópico:</strong> {{ question.topic }}</p>
           <p><strong>Usuário:</strong> {{ question.username }}</p>
         </div>
         <div class="question-info">
           <p><strong>Respostas:</strong> {{ question.answers.length || 0 }}</p>
           <p>
             <strong>Solucionado:</strong>
-            {{ questionHavesCorrectAnswer ? "Sim" : "Não" }}
+            {{ hasCorrectAnswer(question) ? "Sim" : "Não" }}
           </p>
         </div>
       </mat-card-content>

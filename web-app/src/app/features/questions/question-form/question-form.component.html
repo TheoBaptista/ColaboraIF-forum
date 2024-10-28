@@ -33,22 +33,46 @@
           matInput
           formControlName="topic"
           placeholder="Digite o tópico relacionado"
+          (input)="onTopicInput($event)"
         />
         <mat-error *ngIf="questionForm.get('topic')?.hasError('required')">
           Este campo é obrigatório.
         </mat-error>
       </mat-form-field>
 
+      <div
+        *ngIf="filteredTopics && filteredTopics.length > 0"
+        class="suggestions"
+      >
+        <h4>Sugestão de tópicos:</h4>
+        <div class="suggestions-buttons">
+          <button
+            *ngFor="let topic of filteredTopics"
+            mat-raised-button
+            class="suggestions-button"
+            (click)="selectTopic(topic)"
+          >
+            {{ topic }}
+          </button>
+        </div>
+      </div>
+
       <mat-form-field appearance="fill">
         <mat-label>Descrição</mat-label>
         <textarea
+          class="description"
           matInput
           formControlName="description"
           placeholder="Digite a descrição relacionada"
         ></textarea>
-        <mat-error *ngIf="questionForm.get('description')?.hasError('required')">
+        <mat-error
+          *ngIf="questionForm.get('description')?.hasError('required')"
+        >
           Este campo é obrigatório.
         </mat-error>
+        <button mat-button type="button" (click)="insertCodeSnippet()">
+          Inserir Código
+        </button>
       </mat-form-field>
 
       <div class="botoes">

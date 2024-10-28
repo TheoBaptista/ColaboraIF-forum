@@ -38,7 +38,7 @@ export class UserQuestionEditComponent implements OnInit {
   questionForm: FormGroup;
   question: QuestionResponse | null = null;
 
-  categories = ['Front-end', 'Back-end', 'DevOps', 'Data Science'];
+  categories: string[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -51,12 +51,13 @@ export class UserQuestionEditComponent implements OnInit {
       title: ['', Validators.required],
       category: ['', Validators.required],
       topic: ['', Validators.required],
-      description: ['', Validators.required],
+      content: ['', Validators.required],
     });
   }
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
+    
     if (id) {
       this.questionService.getQuestionById(id).subscribe({
         next: (data: QuestionResponse) => {
@@ -67,15 +68,32 @@ export class UserQuestionEditComponent implements OnInit {
           console.error('Erro ao carregar os detalhes da questão', err);
         },
       });
+
+      this.questionService.getCategories().subscribe({
+        next: (data: string[]) => {
+          this.categories = data;
+        },
+        error: (err) => {
+          console.error('Erro ao carregar categorias', err);
+          this.snackBar.open('Erro ao carregar categorias', 'Fechar', {
+            duration: 3000,
+            panelClass: ['custom-snackbar'],
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+          });
+        }
+      });
+
     }
   }
 
   populateForm(question: QuestionResponse) {
+    console.log(question);
     this.questionForm.patchValue({
       title: question.title,
       category: question.category,
       topic: question.topic,
-      description: question.content,
+      content: question.content,
     });
   }
 
@@ -116,5 +134,11 @@ export class UserQuestionEditComponent implements OnInit {
 
   onCancel() {
     this.router.navigate(['/user/questions']);
+  }
+
+  insertCodeSnippet() {
+    const currentDescription = this.questionForm.get('content')?.value || '';
+    const codeSnippet = '```\n// Seu código aqui\n```';
+    this.questionForm.get('content')?.setValue(currentDescription + '\n' + codeSnippet);
   }
 }

@@ -12,20 +12,23 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { debounceTime, Subject } from 'rxjs';
+import { LineClampDirective } from '../../../shared/directives/line-clamp.directive';
 
 @Component({
   selector: 'app-question-list',
   standalone: true,
-  imports: [MatButtonModule, MatCardModule, CommonModule, MatFormFieldModule, MatInputModule, MatIconModule, FormsModule],
+  imports: [MatButtonModule, MatCardModule, CommonModule, MatFormFieldModule, MatInputModule, MatIconModule, FormsModule, LineClampDirective],
   templateUrl: './question-list.component.html',
   styleUrl: './question-list.component.css',
 })
 export class QuestionListComponent {
   questions: QuestionResponse[] = [];
-  questionHavesCorrectAnswer = false;
   questionsResponseCount = 0;
   searchTerm: string = ''; 
-  searchSubject: Subject<string> = new Subject(); 
+  searchSubject: Subject<string> = new Subject();
+  filteredQuestions: QuestionResponse[] = [];
+  categories: string[] = [];
+  selectedCategory: string = 'Todas as perguntas';
 
   constructor(
     private router: Router,
@@ -34,6 +37,7 @@ export class QuestionListComponent {
 
   ngOnInit() {
     this.loadQuestions();
+    this.loadCategories();
 
     this.searchSubject.pipe(
       debounceTime(300)
@@ -47,17 +51,32 @@ export class QuestionListComponent {
     this.questionService.listQuestions().subscribe({
       next: (data: QuestionResponse[]) => {
         this.questions = this.initializeAnswers(data);
-        this.questionHavesCorrectAnswer = this.questions.some(
-          (question) =>
-            Array.isArray(question.answers) &&
-            question.answers.some((answer) => answer?.is_correct_answer)
-        );
+        this.filteredQuestions = this.initializeAnswers(data);
       },
-
       error: (err) => {
         console.error('Erro ao carregar a lista de questões', err);
       },
     });
+  }
+
+  loadCategories() {
+    this.questionService.getCategories().subscribe({
+      next: (categories: any[]) => {
+        this.categories = ['Todas as perguntas', ...categories];
+      },
+      error: (err) => {
+        console.error('Erro ao carregar as categorias', err);
+      },
+    });
+  }
+
+  filterByCategory(category: string) {
+    this.selectedCategory = category;
+    if (category === 'Todas as perguntas') {
+      this.filteredQuestions = [...this.questions];
+    } else {
+      this.filteredQuestions = this.questions.filter(q => q.category === category); 
+    }
   }
 
   goToQuestionForm() {
@@ -79,6 +98,9 @@ export class QuestionListComponent {
     this.searchSubject.next(this.searchTerm);
   }
 
+  hasCorrectAnswer(question: any): boolean {
+    return question.answers.length > 0 && question.answers.some((answer: any) => answer.is_correct_answer);
+  }
 
   searchQuestions(searchTerm: string) {
     if (this.searchTerm.length < 3) {

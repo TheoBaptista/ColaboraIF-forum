@@ -21,6 +21,11 @@ export class AnswerDialogComponent {
   onCancel(): void {
     this.dialogRef.close();
   }
+  
+  insertCodeSnippet() {
+    const codeSnippet = '```\n// Seu código aqui\n```';
+    this.answerContent += `\n${codeSnippet}`; // Adiciona o snippet de código à resposta
+  }
 
   onSubmit(): void {
     if (this.answerContent.trim()) {

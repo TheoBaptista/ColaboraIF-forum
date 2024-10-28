@@ -3,6 +3,7 @@ import { QuestionService } from '../../../core/services/question.service';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
+import { AuthorizationService } from '../../../core/services/authorization.service';
 
 @Component({
   selector: 'app-user-notifications',
@@ -16,20 +17,26 @@ export class UserNotificationsComponent {
 
   constructor(
     private questionService: QuestionService,
-    private router: Router
+    private router: Router,
+    private authService: AuthorizationService
   ) {}
 
   ngOnInit(): void {
-    const userId = 'user123';
+    const user = this.authService.getUserInfo();
 
-    this.questionService.getUserNotifications(userId).subscribe(
-      (data) => {
+    if (!user) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.questionService.getUserNotifications(user.id).subscribe({
+      next: (data) => {
         this.notifications = data;
       },
-      (error) => {
+      error: (error) => {
         console.error('Erro ao buscar notificações:', error);
       }
-    );
+    });
   }
 
   onNotificationClick(notification: any): void {

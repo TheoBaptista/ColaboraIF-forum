@@ -4,10 +4,11 @@
       <mat-card-title>{{ question.title }}</mat-card-title>
       <mat-card-subtitle>Categoria: {{ question.category }}</mat-card-subtitle>
     </mat-card-header>
-    <mat-card-content>
+    <mat-card-content class="question-card-content">
       <p><strong>Tópico:</strong> {{ question.topic }}</p>
       <p><strong>Usuário:</strong> {{ question.username }}</p>
-      <p>{{ question.content }}</p>
+      <p><strong>Descrição:</strong></p>
+      <div [innerHTML]="processContent(question.content)"></div>
     </mat-card-content>
     <mat-card-actions class="card-actions">
       <button mat-icon-button (click)="openAnswerDialog()">
@@ -26,14 +27,14 @@
     <mat-card *ngFor="let answer of question?.answers" class="answer-card">
       <mat-card-content class="answer-card-content">
         <div class="answer-card-info">
-          <p><strong>Resposta:</strong> {{ answer.content }}</p>
+          <p><strong>Resposta:</strong></p><div [innerHTML]="processContent(answer.content)"></div>
           <p><strong>Usuário:</strong> {{ answer.username }}</p>
         </div>
 
         <div class="answer-card-actions">
           <button
             mat-icon-button
-            *ngIf="isQuestionOwner()"
+            *ngIf="isQuestionOwner() && answer.id"
             (click)="markAnswerAsCorrect(answer.id)"
           >
             <mat-icon>{{

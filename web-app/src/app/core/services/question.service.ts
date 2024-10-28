@@ -82,4 +82,12 @@ export class QuestionService {
     return this.http.get<QuestionResponse[]>(`${this.baseUrl}/user/favorite-questions?userId=${userId}`);
   }
 
+  getCategories(): Observable<any> {
+    return this.http.get<string[]>(`${this.baseUrl}/categories`);
+  }
+
+  getTopics(): Observable<any> {
+    return this.http.get<string[]>(`${this.baseUrl}/topics`);
+  }
+
 }

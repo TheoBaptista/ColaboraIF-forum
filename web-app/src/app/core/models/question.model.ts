@@ -19,7 +19,7 @@ export interface QuestionResponse {
 }
 
 export interface Answer {
-  id: string;
+  id?: string; 
   content: string;
   is_correct_answer: boolean;
   user_id: string;

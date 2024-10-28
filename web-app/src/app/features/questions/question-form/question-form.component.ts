@@ -15,6 +15,7 @@ import { QuestionService } from '../../../core/services/question.service';
 import { Question } from '../../../core/models/question.model';
 import { Router } from '@angular/router';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { AuthorizationService } from '../../../core/services/authorization.service';
 
 @Component({
   selector: 'app-question-form',
@@ -29,19 +30,25 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    MatSnackBarModule,
+    MatSnackBarModule
   ],
 })
 export class QuestionFormComponent {
   questionForm: FormGroup;
 
-  categories = ['Frontend', 'Backend', 'DevOps', 'Data Science'];
+  user: any = null;
 
+  categories: string[] = [];
+
+  allTopics: string[] = [];
+  filteredTopics: string[] = []; 
+  
   constructor(
     private fb: FormBuilder,
     private questionService: QuestionService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private authService: AuthorizationService
   ) {
     this.questionForm = this.fb.group({
       title: ['', Validators.required],
@@ -49,6 +56,63 @@ export class QuestionFormComponent {
       topic: ['', Validators.required],
       description: ['', Validators.required],
     });
+
+    this.user = this.authService.getUserInfo();
+    if (!this.user) {
+      this.router.navigate(['/login']);
+      return;
+    }
+  }
+
+  ngOnInit(): void {
+    
+    this.questionService.getCategories().subscribe({
+      next: (data: string[]) => {
+        this.categories = data;
+      },
+      error: (err) => {
+        console.error('Erro ao carregar categorias', err);
+        this.snackBar.open('Erro ao carregar categorias', 'Fechar', {
+          duration: 3000,
+          panelClass: ['custom-snackbar'],
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom',
+        });
+      }
+    });
+
+    this.questionService.getTopics().subscribe({
+      next: (topics: string[]) => {
+        this.allTopics = topics;
+      },
+      error: (err) => {
+        console.error('Erro ao carregar tópicos', err);
+      }
+    });
+  }
+
+  onTopicInput(event: any): void {
+    const value = event.target.value;
+
+    if (value.length < 3) {
+        this.filteredTopics = [];
+        return; 
+    }
+
+    this.filteredTopics = this.allTopics.filter(topic =>
+        topic.toLowerCase().includes(value.toLowerCase())
+    );
+  }
+
+  selectTopic(topic: string): void {
+    this.questionForm.patchValue({ topic });
+    this.filteredTopics = [];
+  }
+
+  insertCodeSnippet() {
+    const currentDescription = this.questionForm.get('description')?.value || '';
+    const codeSnippet = '```\n// Seu código aqui\n```';
+    this.questionForm.get('description')?.setValue(currentDescription + '\n' + codeSnippet);
   }
 
   onSubmit() {
@@ -58,8 +122,8 @@ export class QuestionFormComponent {
         content: this.questionForm.value.description,
         topic: this.questionForm.value.topic,
         category: this.questionForm.value.category,
-        user_id: 'user123',
-        username: 'João',
+        user_id: this.user.id,
+        username: this.user.name,
       };
 
       this.questionService.createQuestion(formData).subscribe({
