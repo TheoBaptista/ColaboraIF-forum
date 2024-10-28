@@ -16,6 +16,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatButtonModule } from '@angular/material/button';
+import { AuthorizationService } from '../../../core/services/authorization.service';
 
 @Component({
   selector: 'app-user-question-edit',
@@ -45,7 +46,8 @@ export class UserQuestionEditComponent implements OnInit {
     private route: ActivatedRoute,
     private questionService: QuestionService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private authService: AuthorizationService
   ) {
     this.questionForm = this.fb.group({
       title: ['', Validators.required],
@@ -99,7 +101,19 @@ export class UserQuestionEditComponent implements OnInit {
 
   onSubmit() {
     if (this.questionForm.valid) {
-      const updatedQuestion = this.questionForm.value;
+      const formQuestion = this.questionForm.value;
+
+      const userId = this.authService.getUserInfo()?.id;
+      
+      if (!userId) {
+        this.authService.logout();
+      }
+      
+      const updatedQuestion = {
+        ...formQuestion,
+        user_id: userId,
+      };
+
       if (this.question) {
         this.questionService
           .updateQuestion(this.question.id, updatedQuestion)
