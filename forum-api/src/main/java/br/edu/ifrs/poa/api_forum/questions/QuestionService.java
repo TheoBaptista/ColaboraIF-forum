@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -120,6 +119,7 @@ public class QuestionService {
         );
     }
 
+    // TODO: implementar deleção apenas do usúrio que criou a pergunta
     public void deleteQuestion(String id) {
         Optional<Question> questionOptional = questionRepository.findById(id);
         if (questionOptional.isPresent()) {
@@ -141,11 +141,11 @@ public class QuestionService {
             Question question = questionOptional.get();
 
             if (!question.getUserId().equals(questionRequest.userId())) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Permissão negada: apenas o autor pode editar a pergunta.");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Permissão negada: apenas o autor pode editar a pergunta.");
             }
 
             if (categoryService.existsCategory(questionRequest.category())) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Categoria inválida.");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria inválida.");
             }
 
             question.setTitle(questionRequest.title());
