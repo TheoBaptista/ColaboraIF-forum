@@ -1,9 +1,12 @@
 package br.edu.ifrs.poa.api_forum.questions;
 
+import br.edu.ifrs.poa.api_forum.questions.answers.Answer;
 import br.edu.ifrs.poa.api_forum.questions.answers.AnswerRequest;
+import br.edu.ifrs.poa.api_forum.questions.answers.AnswerResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -11,6 +14,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/questions")
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class QuestionController {
 
     private final QuestionService questionService;
@@ -22,10 +26,7 @@ public class QuestionController {
     @PostMapping
     public ResponseEntity<QuestionResponse> createQuestion(@RequestBody QuestionRequest questionRequest) {
         Question savedQuestion = questionService.addQuestion(questionRequest);
-
-        QuestionResponse questionResponse = new QuestionResponse(savedQuestion);
-
-        return new ResponseEntity<>(questionResponse, HttpStatus.CREATED);
+        return new ResponseEntity<>(new QuestionResponse(savedQuestion), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -34,29 +35,19 @@ public class QuestionController {
         List<QuestionResponse> questionResponses = questions.stream()
                 .map(QuestionResponse::new)
                 .toList();
-
-        return new ResponseEntity<>(questionResponses, HttpStatus.OK);
+        return ResponseEntity.ok(questionResponses);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<QuestionResponse> getQuestion(@PathVariable String id) {
-        Optional<Question> question = questionService.findById(id);
-        if (question.isPresent()) {
-            QuestionResponse questionResponse = new QuestionResponse(question.get());
-            return ResponseEntity.ok(questionResponse);
-        }
-        return ResponseEntity.notFound().build();
+        Question question = questionService.findById(id);
+        return ResponseEntity.ok(new QuestionResponse(question));
     }
 
-    @PostMapping("/{id}/answers")
-    public ResponseEntity<?> addAnswer(@PathVariable String id, @RequestBody AnswerRequest answerRequest) {
-
-        Question updatedQuestion = questionService.addAnswer(id, answerRequest);
-
-        if (updatedQuestion != null) {
-            return ResponseEntity.ok(updatedQuestion);
-        }
-        return ResponseEntity.notFound().build();
+    @PostMapping("/{questionId}/answers")
+    public ResponseEntity<Question> addAnswer(@PathVariable String questionId, @RequestBody AnswerRequest answerRequest) {
+        Question updatedQuestion = questionService.addAnswer(questionId, answerRequest);
+        return ResponseEntity.ok(updatedQuestion);
     }
 
     @GetMapping("/search")
@@ -65,7 +56,6 @@ public class QuestionController {
         List<QuestionResponse> questionResponses = questions.stream()
                 .map(QuestionResponse::new)
                 .toList();
-
         return ResponseEntity.ok(questionResponses);
     }
 
@@ -77,26 +67,22 @@ public class QuestionController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<QuestionResponse> updateQuestion(@PathVariable String id, @RequestBody QuestionRequest questionRequest) {
-        Optional<Question> updatedQuestion = questionService.updateQuestion(id, questionRequest);
-        return updatedQuestion.map(question -> ResponseEntity.ok(new QuestionResponse(question)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        Question updatedQuestion = questionService.updateQuestion(id, questionRequest);
+        return ResponseEntity.ok(new QuestionResponse(updatedQuestion));
     }
 
     @PatchMapping("/{questionId}/answers/{answerId}/correct")
-    public ResponseEntity<String> markAnswerAsCorrect(
+    public ResponseEntity<AnswerResponse> markAnswerAsCorrect(
             @PathVariable String questionId,
             @PathVariable String answerId,
             @RequestBody Map<String, String> requestBody) {
-
         String userId = requestBody.get("userId");
-        boolean result = questionService.markAnswerAsCorrect(questionId, answerId, userId);
+        Optional<Answer> updatedAnswer = questionService.markAnswerAsCorrect(questionId, answerId, userId);
 
-        if (result) {
-            return ResponseEntity.ok("Answer marked as correct.");
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Only the user who created the question can mark an answer as correct.");
+        if (updatedAnswer.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Apenas o autor da pergunta pode marcar como correta");
         }
-    }
 
+        return ResponseEntity.ok(new AnswerResponse(updatedAnswer.get()));
+    }
 }

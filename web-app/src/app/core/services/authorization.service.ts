@@ -3,6 +3,7 @@ import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { LoginResponse } from '../models/question.model';
 
 @Injectable({
   providedIn: 'root',
@@ -50,6 +51,7 @@ export class AuthorizationService {
 
   logout() {
     if (typeof window !== 'undefined' && window.localStorage) {
+      this.http.post(`${this.baseUrl}/logout`, {}).subscribe((_) => {});
       localStorage.removeItem(this.tokenKey);
       localStorage.removeItem(this.userKey);
       this.router.navigate(['/login']).then(() => {
@@ -58,7 +60,7 @@ export class AuthorizationService {
     }
   }
 
-  login(idToken: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/login`, { idToken });
+  login(idToken: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.baseUrl}/login`, { idToken });
   }
 }

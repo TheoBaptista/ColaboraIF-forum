@@ -1,9 +1,12 @@
 package br.edu.ifrs.poa.api_forum.questions;
 
+import br.edu.ifrs.poa.api_forum.exception.ResourceNotFoundException;
+import br.edu.ifrs.poa.api_forum.notification.NotificationService;
 import br.edu.ifrs.poa.api_forum.questions.answers.Answer;
 import br.edu.ifrs.poa.api_forum.questions.answers.AnswerRequest;
 import br.edu.ifrs.poa.api_forum.questions.cateogories.CategoryService;
 import br.edu.ifrs.poa.api_forum.questions.topics.TopicService;
+import br.edu.ifrs.poa.api_forum.users.UserService;
 import com.mongodb.MongoCommandException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -31,12 +34,16 @@ public class QuestionService {
     private final CategoryService categoryService;
     private final MongoTemplate mongoTemplate;
     private final TopicService topicService;
+    private final UserService userService;
+    private final NotificationService notificationService;
 
-    public QuestionService(QuestionRepository questionRepository, CategoryService categoryService, MongoTemplate mongoTemplate, TopicService topicService) {
+    public QuestionService(QuestionRepository questionRepository, CategoryService categoryService, MongoTemplate mongoTemplate, TopicService topicService, UserService userService, NotificationService notificationService) {
         this.questionRepository = questionRepository;
         this.categoryService = categoryService;
         this.mongoTemplate = mongoTemplate;
         this.topicService = topicService;
+        this.userService = userService;
+        this.notificationService = notificationService;
     }
 
     @PostConstruct
@@ -66,6 +73,8 @@ public class QuestionService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria inválida.");
         }
 
+        userService.getUser(questionRequest.userId());
+
         Question question = new Question(
                 questionRequest.title(),
                 questionRequest.content(),
@@ -83,8 +92,14 @@ public class QuestionService {
         return savedQuestion;
     }
 
-    public Optional<Question> findById(String id) {
-        return questionRepository.findById(id);
+    public Question findById(String id) {
+        val questionOptional = questionRepository.findById(id);
+
+        if (questionOptional.isEmpty()) {
+            throw new ResourceNotFoundException("Pergunta não encontrada.");
+        }
+
+        return questionOptional.get();
     }
 
     public List<Question> getAllQuestions() {
@@ -93,22 +108,30 @@ public class QuestionService {
 
     public Question addAnswer(String questionId, AnswerRequest answerRequest) {
 
+        userService.getUser(answerRequest.userId());
+
         Optional<Question> questionOptional = questionRepository.findById(questionId);
 
-        if (questionOptional.isPresent()) {
-            Question question = questionOptional.get();
-
-            Answer answer = new Answer(
-                    answerRequest.content(),
-                    false,
-                    answerRequest.userId(),
-                    answerRequest.username()
-            );
-
-            question.getAnswers().add(answer);
-            return questionRepository.save(question);
+        if (questionOptional.isEmpty()) {
+            throw new ResourceNotFoundException("Pergunta não encontrada.");
         }
-        return null;
+
+        Question question = questionOptional.get();
+
+        Answer answer = new Answer(
+                answerRequest.content(),
+                false,
+                answerRequest.userId(),
+                answerRequest.username()
+        );
+
+        question.getAnswers().add(answer);
+        questionRepository.save(question);
+
+        String message = "Nova resposta de " + answerRequest.username() + " para a pergunta que voce criou com título: " + question.getTitle();
+        notificationService.notifyUser(questionId, message);
+
+        return question;
     }
 
     public List<Question> searchQuestions(String query) {
@@ -133,57 +156,53 @@ public class QuestionService {
         }
     }
 
-    public Optional<Question> updateQuestion(String id, QuestionRequest questionRequest) {
+    public Question updateQuestion(String questionId, QuestionRequest questionRequest) {
 
-        Optional<Question> questionOptional = questionRepository.findById(id);
-        if (questionOptional.isPresent()) {
+        userService.getUser(questionRequest.userId());
 
-            Question question = questionOptional.get();
-
-            if (!question.getUserId().equals(questionRequest.userId())) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Permissão negada: apenas o autor pode editar a pergunta.");
-            }
-
-            if (categoryService.existsCategory(questionRequest.category())) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria inválida.");
-            }
-
-            question.setTitle(questionRequest.title());
-            question.setContent(questionRequest.content());
-            question.setTopic(questionRequest.topic());
-            question.setCategory(questionRequest.category());
-
-            val savedQuestion = questionRepository.save(question);
-            topicService.addTopic(savedQuestion.getTopic());
-
-            return Optional.of(questionRepository.save(question));
-        }
-        return Optional.empty();
+        Question question = findQuestionByIdOrThrow(questionId);
+        validateOwnership(question.getUserId(), questionRequest.userId());
+        validateCategory(questionRequest.category());
+        question.setTitle(questionRequest.title());
+        question.setContent(questionRequest.content());
+        question.setTopic(questionRequest.topic());
+        question.setCategory(questionRequest.category());
+        return questionRepository.save(question);
     }
 
-    public boolean markAnswerAsCorrect(String questionId, String answerId, String userId) {
-        Optional<Question> questionOptional = questionRepository.findById(questionId);
+    public Optional<Answer> markAnswerAsCorrect(String questionId, String answerId, String userId) {
 
-        if (questionOptional.isPresent()) {
-            Question question = questionOptional.get();
+        userService.getUser(userId);
 
-            if (!question.getUserId().equals(userId)) {
-                return false;
-            }
 
-            question.getAnswers().forEach(answer -> answer.setCorrectAnswer(false));
 
-            Answer selectedAnswer = question.getAnswers().stream()
-                    .filter(answer -> answer.getId().equals(answerId))
-                    .findFirst()
-                    .orElse(null);
+        Question question = findQuestionByIdOrThrow(questionId);
+        validateOwnership(question.getUserId(), userId);
+        question.getAnswers().forEach(answer -> answer.setCorrectAnswer(false));
+        Answer selectedAnswer = question.getAnswers().stream()
+                .filter(answer -> answer.getId().equals(answerId))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resposta não encontrada."));
+        selectedAnswer.setCorrectAnswer(true);
 
-            if (selectedAnswer != null) {
-                selectedAnswer.setCorrectAnswer(true);
-                questionRepository.save(question);
-                return true;
-            }
-        }
-        return false;
+        return questionRepository.save(question).getAnswers().stream().filter(Answer::isCorrectAnswer).findFirst();
     }
+
+    private void validateCategory(String category) {
+        if (!categoryService.existsCategory(category)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria inválida.");
+        }
+    }
+
+    private void validateOwnership(String ownerId, String userId) {
+        if (!ownerId.equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Permissão negada: apenas o autor pode modificar a pergunta.");
+        }
+    }
+
+    private Question findQuestionByIdOrThrow(String id) {
+        return questionRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pergunta não encontrada."));
+    }
+
 }

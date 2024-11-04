@@ -40,13 +40,14 @@ export class UserNotificationsComponent {
   }
 
   onNotificationClick(notification: any): void {
-    this.questionService.deleteNotification(notification.id).subscribe(
+    console.log('Notificação selecionada:', notification);
+    this.questionService.deleteNotification(notification.userId, notification.id).subscribe(
       () => {
         this.notifications = this.notifications.filter(
           (n) => n.id !== notification.id
         );
 
-        this.router.navigate(['/question', notification.question_id]);
+        this.router.navigate(['/question', notification.questionId]);
       },
       (error) => {
         console.error('Erro ao deletar notificação:', error);

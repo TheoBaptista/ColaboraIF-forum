@@ -45,23 +45,29 @@ export class QuestionService {
   }
 
   getUserNotifications(userId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/notifications`, {
-      params: { userId },
-    });
+    return this.http.get<any[]>(`${this.baseUrl}/notifications/${userId}`);
   }
 
-  deleteNotification(notificationId: string): Observable<void> {
+  deleteNotification(userId: string, notificationId: string): Observable<void> {
     return this.http.delete<void>(
-      `${this.baseUrl}/notifications/${notificationId}`
+      `${this.baseUrl}/notifications/${userId}/${notificationId}`
     );
   }
 
-  addAnswer(questionId: string, answer: any): Observable<Answer> {
-    return this.http.post<Answer>(
+  addAnswer(questionId: string, answer: Answer): Observable<Answer> {
+    
+  const answerRequest = {
+    content: answer.content,
+    userId: answer.user_id,
+    username: answer.username,
+  };
+
+  return this.http.post<Answer>(
       `${this.baseUrl}/questions/${questionId}/answers`,
-      answer
+      answerRequest
     );
   }
+  
   markAnswerAsCorrect(questionId: string, answerId: string, userId: string) {
     return this.http.patch(`${this.baseUrl}/questions/${questionId}/answers/${answerId}/correct`, { userId });
   }

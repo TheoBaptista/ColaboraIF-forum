@@ -1,16 +1,16 @@
-package br.edu.ifrs.poa.api_forum.users;
+package br.edu.ifrs.poa.api_forum.notification;
 
-import lombok.Getter;
+import lombok.Data;
 
 import java.util.UUID;
 
-@Getter
+@Data
 public class Notification {
 
-    private final String id;
-    private final String userId;
-    private final String message;
-    private final String questionId;
+    private String id;
+    private String userId;
+    private String message;
+    private String questionId;
     private boolean hasRead;
 
     public Notification(String userId, String message, String questionId) {

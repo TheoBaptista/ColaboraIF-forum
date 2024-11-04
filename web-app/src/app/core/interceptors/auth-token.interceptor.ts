@@ -10,13 +10,17 @@ export const authTokenInterceptor: HttpInterceptorFn = (req, next) => {
   const snackBar = inject(MatSnackBar); 
   const token = authService.getToken();
 
+  console.log("Authorization Token:", token);
+
   let clonedRequest = req;
+
   if (token && !req.url.endsWith('/api/login')) {
     clonedRequest = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`
       }
     });
+    console.log("Authorization Header Set:", clonedRequest.headers.get('Authorization'));
   }
 
   

@@ -1,15 +1,16 @@
 package br.edu.ifrs.poa.api_forum.users;
 
+import lombok.Data;
 import lombok.Getter;
 
 import java.util.UUID;
 
-@Getter
+@Data
 public class FavoriteQuestion {
 
-    private final String id;
-    private final String userId;
-    private final String questionId;
+    private String id;
+    private String userId;
+    private String questionId;
 
     public FavoriteQuestion(String userId, String questionId) {
         this.id = UUID.randomUUID().toString();

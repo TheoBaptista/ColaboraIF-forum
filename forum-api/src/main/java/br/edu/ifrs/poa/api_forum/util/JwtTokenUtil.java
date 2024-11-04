@@ -2,10 +2,12 @@ package br.edu.ifrs.poa.api_forum.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.security.Key;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -13,18 +15,20 @@ import java.util.function.Function;
 public class JwtTokenUtil {
 
     @Value("${jwt.secret}")
-    private String jwtSecret;
+    private String jwtSecretString;
 
     @Value("${jwt.expirationMs}")
     private int jwtExpirationMs;
 
     public String generateToken(String userId, String email) {
+        Key secretKey = getSigningKey();
+
         return Jwts.builder()
                 .setSubject(userId)
                 .claim("email", email)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .signWith(secretKey)
                 .compact();
     }
 
@@ -46,9 +50,17 @@ public class JwtTokenUtil {
     }
 
     private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parser()
+        Key jwtSecret = getSigningKey();
+
+        return Jwts.parserBuilder()
                 .setSigningKey(jwtSecret)
+                .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    private Key getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(this.jwtSecretString);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }

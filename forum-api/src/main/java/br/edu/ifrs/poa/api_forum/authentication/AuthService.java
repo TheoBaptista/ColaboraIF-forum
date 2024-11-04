@@ -42,23 +42,28 @@ public class AuthService {
 
             User user = findOrCreateUser(email, payload.getStringClaim("name"));
 
-            var userInfo = new LoginResponse(jwtTokenUtil.generateToken(user.getId(), email), user.getName(), user.getEmail());
+            var userInfo = new LoginResponse(jwtTokenUtil.generateToken(user.getId(), email), user.getName(), user.getEmail(), user.getId());
 
             redisService.saveUserSession(userInfo.token(), userInfo.name(), userInfo.email());
 
             return userInfo;
 
         } catch (ParseException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Erro ao analisar o token JWT", e);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token enviado é inválido", e);
         }
     }
 
     public void logout(String token) {
+        if (!token.startsWith("Bearer ")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token é obrigatório");
+        }
+        token = token.substring(7);
+
         redisService.deleteUserSession(token);
     }
 
     private void validateEmailDomain(String email) {
-        if (!email.endsWith("@ifrs.edu.br")) {
+        if (!email.endsWith("ifrs.edu.br")) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "E-mail não autorizado");
         }
     }

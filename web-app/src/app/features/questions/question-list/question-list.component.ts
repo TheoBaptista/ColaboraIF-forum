@@ -96,6 +96,9 @@ export class QuestionListComponent {
 
   onSearchInputChange() {
     this.searchSubject.next(this.searchTerm);
+    if (this.searchTerm === '') {
+      this.filteredQuestions = [...this.questions];
+    }
   }
 
   hasCorrectAnswer(question: any): boolean {
@@ -103,13 +106,14 @@ export class QuestionListComponent {
   }
 
   searchQuestions(searchTerm: string) {
-    if (this.searchTerm.length < 3) {
+    if (searchTerm.length < 3) {
+      this.filteredQuestions = [...this.questions];
       return;
-    }
+  }
 
-    this.questionService.searchQuestions(this.searchTerm).subscribe({
+    this.questionService.searchQuestions(searchTerm).subscribe({
       next: (data: QuestionResponse[]) => {
-        this.questions = this.initializeAnswers(data);
+        this.filteredQuestions = this.initializeAnswers(data);
       },
       error: (err) => {
         console.error('Erro ao buscar as questões', err);
