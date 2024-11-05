@@ -32,8 +32,8 @@
 
 .answer-card-content {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .answer-card-actions {
@@ -50,6 +50,8 @@
   padding: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 16px;
+  display: flex;
+  flex-direction: column;
 }
 
 .answer-card-info{

@@ -106,7 +106,7 @@ public class QuestionService {
         return questionRepository.findAll();
     }
 
-    public Question addAnswer(String questionId, AnswerRequest answerRequest) {
+    public QuestionResponse addAnswer(String questionId, AnswerRequest answerRequest) {
 
         userService.getUser(answerRequest.userId());
 
@@ -131,7 +131,7 @@ public class QuestionService {
         String message = "Nova resposta de " + answerRequest.username() + " para a pergunta que voce criou com título: " + question.getTitle();
         notificationService.notifyUser(questionId, message);
 
-        return question;
+        return new QuestionResponse(question);
     }
 
     public List<Question> searchQuestions(String query) {

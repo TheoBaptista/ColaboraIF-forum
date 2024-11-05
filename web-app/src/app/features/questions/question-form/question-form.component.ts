@@ -80,15 +80,6 @@ export class QuestionFormComponent {
         });
       }
     });
-
-    this.questionService.getTopics().subscribe({
-      next: (topics: string[]) => {
-        this.allTopics = topics;
-      },
-      error: (err) => {
-        console.error('Erro ao carregar tópicos', err);
-      }
-    });
   }
 
   onTopicInput(event: any): void {
@@ -99,9 +90,14 @@ export class QuestionFormComponent {
         return; 
     }
 
-    this.filteredTopics = this.allTopics.filter(topic =>
-        topic.toLowerCase().includes(value.toLowerCase())
-    );
+    this.questionService.getTopics(value).subscribe({
+      next: (topics: string[]) => {
+          this.filteredTopics = topics;
+      },
+      error: (err) => {
+          console.error('Erro ao buscar tópicos semelhantes', err);
+      }
+  });
   }
 
   selectTopic(topic: string): void {

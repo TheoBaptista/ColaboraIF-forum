@@ -6,8 +6,15 @@
         matInput
         placeholder="Digite sua pesquisa"
         [(ngModel)]="searchTerm"
-        (ngModelChange)="onSearchInputChange()" />
-      <mat-icon matSuffix>search</mat-icon>
+        (ngModelChange)="onSearchInputChange()"
+        (keydown.enter)="searchQuestions(searchTerm)"
+      />
+      <mat-icon
+        matSuffix
+        (click)="searchQuestions(searchTerm)"
+        style="cursor: pointer"
+        >search</mat-icon
+      >
     </mat-form-field>
     <button
       class="search-button custom-button-color"
@@ -18,42 +25,67 @@
     </button>
   </div>
 
-  <div class="category-buttons">
+  <div class="category-buttons" *ngIf="!isMobile">
     <button
       *ngFor="let category of categories"
       mat-raised-button
       class="category-button"
-      (click)="filterByCategory(category)"      
+      (click)="filterByCategory(category)"
     >
       {{ category }}
     </button>
   </div>
+  <div *ngIf="isMobile" class="category-dropdown-container">
+    <mat-form-field appearance="outline" class="category-dropdown">
+      <mat-label>Selecione a Categoria</mat-label>
+      <mat-select
+        [(value)]="selectedCategory"
+        (selectionChange)="filterByCategory(selectedCategory)"
+      >
+        <mat-option *ngFor="let category of categories" [value]="category">
+          {{ category }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
 
   <div class="question-list">
-    <mat-card
-      *ngFor="let question of filteredQuestions"
-      class="question-card clickable-card" 
-      (click)="viewQuestionDetails(question.id)"
-    >
-      <mat-card-header>
-        <mat-card-title [appLineClamp]="1">{{ question.title }}</mat-card-title>
-        <mat-card-subtitle
-          >Categoria: {{ question.category }}</mat-card-subtitle
-        >
-      </mat-card-header>
-      <mat-card-content>
-        <div class="question-content">
-          <p [appLineClamp]="1"><strong>Tópico:</strong> {{ question.topic }}</p>
-          <p><strong>Usuário:</strong> {{ question.username }}</p>
-        </div>
-        <div class="question-info">
-          <p><strong>Respostas:</strong> {{ question.answers.length || 0 }}</p>
-          <p>
-            <strong>Solucionado:</strong>
-            {{ hasCorrectAnswer(question) ? "Sim" : "Não" }}
-          </p>
-        </div>
-      </mat-card-content>
-    </mat-card>
+    <ng-container *ngIf="filteredQuestions.length > 0; else noResults">
+      <mat-card
+        *ngFor="let question of filteredQuestions"
+        class="question-card clickable-card"
+        (click)="viewQuestionDetails(question.id)"
+      >
+        <mat-card-header>
+          <mat-card-title [appLineClamp]="1">{{
+            question.title
+          }}</mat-card-title>
+          <mat-card-subtitle
+            >Categoria: {{ question.category }}</mat-card-subtitle
+          >
+        </mat-card-header>
+        <mat-card-content>
+          <div class="question-content">
+            <p [appLineClamp]="1">
+              <strong>Tópico:</strong> {{ question.topic }}
+            </p>
+            <p><strong>Usuário:</strong> {{ question.username }}</p>
+          </div>
+          <div class="question-info">
+            <p>
+              <strong>Respostas:</strong> {{ question.answers.length || 0 }}
+            </p>
+            <p>
+              <strong>Solucionado:</strong>
+              {{ hasCorrectAnswer(question) ? "Sim" : "Não" }}
+            </p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </ng-container>
+
+    <ng-template #noResults>
+      <p class="no-results-message">Nenhuma pergunta encontrada!</p>
+    </ng-template>
   </div>
 </div>

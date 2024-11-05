@@ -29,7 +29,13 @@ public class TopicService {
     }
 
     public void addTopic(String topic) {
-        topicRepository.save(new Topic(topic));
+        String normalizedTopicName = topic.trim().toLowerCase(Locale.ROOT);
+
+        boolean exists = topicRepository.findByName(normalizedTopicName).isPresent();
+
+        if (!exists) {
+            topicRepository.save(new Topic(normalizedTopicName));
+        }
     }
 
 }

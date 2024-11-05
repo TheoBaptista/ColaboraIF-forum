@@ -45,9 +45,8 @@ public class QuestionController {
     }
 
     @PostMapping("/{questionId}/answers")
-    public ResponseEntity<Question> addAnswer(@PathVariable String questionId, @RequestBody AnswerRequest answerRequest) {
-        Question updatedQuestion = questionService.addAnswer(questionId, answerRequest);
-        return ResponseEntity.ok(updatedQuestion);
+    public ResponseEntity<QuestionResponse> addAnswer(@PathVariable String questionId, @RequestBody AnswerRequest answerRequest) {
+        return ResponseEntity.ok(questionService.addAnswer(questionId, answerRequest));
     }
 
     @GetMapping("/search")

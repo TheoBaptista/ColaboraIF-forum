@@ -11,13 +11,15 @@ import {
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
-import { debounceTime, Subject } from 'rxjs';
+import { debounceTime, Subject, Subscription } from 'rxjs';
 import { LineClampDirective } from '../../../shared/directives/line-clamp.directive';
+import { MatSelect, MatSelectModule } from '@angular/material/select';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-question-list',
   standalone: true,
-  imports: [MatButtonModule, MatCardModule, CommonModule, MatFormFieldModule, MatInputModule, MatIconModule, FormsModule, LineClampDirective],
+  imports: [MatButtonModule, MatCardModule, CommonModule, MatFormFieldModule, MatInputModule, MatIconModule, FormsModule, LineClampDirective,MatSelectModule],
   templateUrl: './question-list.component.html',
   styleUrl: './question-list.component.css',
 })
@@ -29,13 +31,23 @@ export class QuestionListComponent {
   filteredQuestions: QuestionResponse[] = [];
   categories: string[] = [];
   selectedCategory: string = 'Todas as perguntas';
+  isMobile: boolean = false;
+  private breakpointSubscription!: Subscription;
 
   constructor(
     private router: Router,
-    private questionService: QuestionService
+    private questionService: QuestionService,
+    private breakpointObserver: BreakpointObserver
   ) {}
 
   ngOnInit() {
+
+    this.breakpointSubscription = this.breakpointObserver
+    .observe([Breakpoints.Handset])
+    .subscribe(result => {
+      this.isMobile = result.matches;
+    });
+
     this.loadQuestions();
     this.loadCategories();
 
@@ -45,6 +57,10 @@ export class QuestionListComponent {
       this.searchQuestions(searchTerm);
     });
 
+  }
+
+  ngOnDestroy() {
+    this.breakpointSubscription.unsubscribe();
   }
 
   loadQuestions() {
@@ -95,7 +111,6 @@ export class QuestionListComponent {
   }
 
   onSearchInputChange() {
-    this.searchSubject.next(this.searchTerm);
     if (this.searchTerm === '') {
       this.filteredQuestions = [...this.questions];
     }
