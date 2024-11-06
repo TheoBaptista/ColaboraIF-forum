@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -140,6 +142,30 @@ public class QuestionService {
                 query(criteria),
                 Question.class
         );
+    }
+
+    public List<QuestionResponse> advancedSearch(String titleOrDescription, String topic, String category, Boolean hasAnswers, Boolean isSolved) {
+        Query query = new Query();
+
+        Criteria titleOrDescriptionCriteria = new Criteria().orOperator(
+                Criteria.where("title").regex(titleOrDescription, "i"),
+                Criteria.where("content").regex(titleOrDescription, "i")
+        );
+        query.addCriteria(titleOrDescriptionCriteria);
+
+        if (topic != null && !topic.isBlank()) {
+            query.addCriteria(Criteria.where("topic").is(topic.toLowerCase().trim()));
+        }
+
+        query.addCriteria(Criteria.where("category").is(category));
+
+        val questionList = mongoTemplate.find(query, Question.class);
+
+        if (questionList.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nenhuma pergunta encontrada.");
+        }
+
+        return questionList.stream().map(QuestionResponse::new).toList();
     }
 
     // TODO: implementar deleção apenas do usúrio que criou a pergunta

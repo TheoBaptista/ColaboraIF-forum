@@ -58,6 +58,18 @@ public class QuestionController {
         return ResponseEntity.ok(questionResponses);
     }
 
+    @GetMapping("/advanced-search")
+    public ResponseEntity<List<QuestionResponse>> advancedSearch(
+            @RequestParam String titleOrDescription,
+            @RequestParam(required = false) String topic,
+            @RequestParam String category,
+            @RequestParam(required = false) Boolean hasAnswers,
+            @RequestParam(required = false) Boolean isSolved) {
+
+        List<QuestionResponse> results = questionService.advancedSearch(titleOrDescription, topic, category, hasAnswers, isSolved);
+        return ResponseEntity.ok(results);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteQuestion(@PathVariable String id) {
         questionService.deleteQuestion(id);

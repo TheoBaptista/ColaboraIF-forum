@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Answer, Question, QuestionResponse } from '../models/question.model';
 
@@ -28,6 +28,29 @@ export class QuestionService {
     return this.http.get<QuestionResponse[]>(
       `${this.baseUrl}/questions/search?q=${query}`
     );
+  }
+
+  advancedSearch(filters: any): Observable<QuestionResponse[]> {
+    let params = new HttpParams();
+
+    // Adiciona os parâmetros de pesquisa se existirem
+    if (filters.titleOrDescription) {
+      params = params.set('titleOrDescription', filters.titleOrDescription);
+    }
+    if (filters.topic) {
+      params = params.set('topic', filters.topic);
+    }
+    if (filters.category) {
+      params = params.set('category', filters.category);
+    }
+    if (filters.hasAnswers !== '') {
+      params = params.set('hasAnswers', filters.hasAnswers);
+    }
+    if (filters.isSolved !== '') {
+      params = params.set('isSolved', filters.isSolved);
+    }
+
+    return this.http.get<QuestionResponse[]>(`${this.baseUrl}/questions/advanced-search`, { params });
   }
 
   getUserQuestions(userId: string): Observable<QuestionResponse[]> {

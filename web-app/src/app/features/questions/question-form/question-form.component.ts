@@ -35,18 +35,16 @@ import { AuthorizationService } from '../../../core/services/authorization.servi
 })
 export class QuestionFormComponent {
   questionForm: FormGroup;
-
   user: any = null;
-
   categories: string[] = [];
-
   allTopics: string[] = [];
-  filteredTopics: string[] = []; 
+  filteredTopics: string[] = [];
+  suggestedQuestions: any[] = [];
   
   constructor(
     private fb: FormBuilder,
     private questionService: QuestionService,
-    private router: Router,
+    public router: Router,
     private snackBar: MatSnackBar,
     private authService: AuthorizationService
   ) {
@@ -82,6 +80,22 @@ export class QuestionFormComponent {
     });
   }
 
+  onTitleInput(event: any): void {
+    const title = event.target.value;
+    if (title.length >= 4) {
+      this.questionService.searchQuestions(title).subscribe({
+        next: (questions: any[]) => {
+          this.suggestedQuestions = questions;
+        },
+        error: (err) => {
+          console.error('Erro ao buscar perguntas sugeridas', err);
+        }
+      });
+    } else {
+      this.suggestedQuestions = [];
+    }
+  }
+
   onTopicInput(event: any): void {
     const value = event.target.value;
 
@@ -103,6 +117,10 @@ export class QuestionFormComponent {
   selectTopic(topic: string): void {
     this.questionForm.patchValue({ topic });
     this.filteredTopics = [];
+  }
+
+  viewQuestionDetails(id: string) {
+    this.router.navigate([`/question/${id}`]);
   }
 
   insertCodeSnippet() {

@@ -9,11 +9,27 @@
           matInput
           formControlName="title"
           placeholder="Digite o título da sua pergunta"
+          (input)="onTitleInput($event)"
         />
         <mat-error *ngIf="questionForm.get('title')?.hasError('required')">
           Este campo é obrigatório.
         </mat-error>
       </mat-form-field>
+
+      <!-- Sugestões de perguntas -->
+      <div *ngIf="suggestedQuestions.length > 0" class="suggestions">
+        <h4>Perguntas parecidas encontradas:</h4>
+        <div class="suggestions-buttons">
+          <button
+            *ngFor="let question of suggestedQuestions"
+            mat-raised-button
+            class="suggestions-button"
+            (click)="viewQuestionDetails(question.id)"
+          >
+            {{ question.title }}
+          </button>
+        </div>
+      </div>
 
       <mat-form-field appearance="fill">
         <mat-label>Categoria</mat-label>

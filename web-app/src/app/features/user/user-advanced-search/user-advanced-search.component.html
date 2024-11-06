@@ -43,7 +43,7 @@
         </mat-error>
       </mat-form-field>
 
-      <mat-form-field appearance="fill">
+      <!-- <mat-form-field appearance="fill">
         <mat-label>Com Respostas</mat-label>
         <mat-select formControlName="hasAnswers">
           <mat-option value="">Todas</mat-option>
@@ -59,7 +59,7 @@
           <mat-option [value]="true">Sim</mat-option>
           <mat-option [value]="false">Não</mat-option>
         </mat-select>
-      </mat-form-field>
+      </mat-form-field> -->
 
       <div class="button-container">
         <button
@@ -73,4 +73,48 @@
       </div>
     </form>
   </mat-card>
+
+  <div *ngIf="questions === null" class="search-status">
+    <p>Faça uma busca para ver os resultados.</p>
+  </div>
+  
+  <div *ngIf="questions && questions.length === 0" class="search-status">
+    <p>Nenhuma pergunta encontrada.</p>
+  </div>
+
+  <div *ngIf="questions && questions.length > 0" class="question-list">
+    <ng-container class="search-results">
+      <mat-card
+      *ngFor="let question of questions"
+        class="question-card clickable-card"
+        (click)="viewQuestionDetails(question.id)"
+      >
+        <mat-card-header>
+          <mat-card-title [appLineClamp]="1">{{
+            question.title
+          }}</mat-card-title>
+          <mat-card-subtitle
+            >Categoria: {{ question.category }}</mat-card-subtitle
+          >
+        </mat-card-header>
+        <mat-card-content>
+          <div class="question-content">
+            <p [appLineClamp]="1">
+              <strong>Tópico:</strong> {{ question.topic }}
+            </p>
+            <p><strong>Usuário:</strong> {{ question.username }}</p>
+          </div>
+          <div class="question-info">
+            <p>
+              <strong>Respostas:</strong> {{ question.answers.length || 0 }}
+            </p>
+            <p>
+              <strong>Solucionado:</strong>
+              {{ hasCorrectAnswer(question) ? "Sim" : "Não" }}
+            </p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </ng-container>
+  </div> 
 </div>
