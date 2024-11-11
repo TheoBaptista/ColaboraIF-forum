@@ -1,8 +1,17 @@
 .wrapper {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  min-height: 100vh;
+  padding: 20px;
+  gap: 20px;
+}
+
+.question-content {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
 .advanced-search-card {
@@ -36,6 +45,41 @@ button {
   width: 48%;
   padding: 16px 32px;
   font-size: 16px;
+}
+
+.search-status {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #777;
+}
+
+.question-list {
+  width: 100%;
+  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.question-card {
+  margin-bottom: 10px; 
+  background-color: #b9eeb5;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+  border-radius: 8px; 
+}
+
+.question-card:hover {
+  background-color: #a8d4a4 !important;
+}
+
+.clickable-card {
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.clickable-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 @media (max-width: 768px) {

@@ -9,11 +9,33 @@
           matInput
           formControlName="title"
           placeholder="Digite o título da sua pergunta"
+          (input)="onTitleInput($event)"
         />
         <mat-error *ngIf="questionForm.get('title')?.hasError('required')">
           Este campo é obrigatório.
         </mat-error>
+        <mat-error *ngIf="questionForm.get('title')?.hasError('minlength')">
+          O título deve ter pelo menos 5 caracteres
+        </mat-error>
+        <mat-error *ngIf="questionForm.get('title')?.hasError('maxlength')">
+          O título deve ter no máximo 100 caracteres
+        </mat-error>
       </mat-form-field>
+
+  
+      <div *ngIf="suggestedQuestions.length > 0" class="suggestions">
+        <h4>Perguntas parecidas encontradas:</h4>
+        <div class="suggestions-buttons">
+          <button
+            *ngFor="let question of suggestedQuestions"
+            mat-raised-button
+            class="suggestions-button"
+            (click)="viewQuestionDetails(question.id)"
+          >
+            <p [appLineClamp]="2">{{ question.title }}</p>
+          </button>
+        </div>
+      </div>
 
       <mat-form-field appearance="fill">
         <mat-label>Categoria</mat-label>
@@ -37,6 +59,9 @@
         />
         <mat-error *ngIf="questionForm.get('topic')?.hasError('required')">
           Este campo é obrigatório.
+        </mat-error>
+        <mat-error *ngIf="questionForm.get('topic')?.hasError('maxlength')">
+          O tópico deve ter no máximo 30 caracteres
         </mat-error>
       </mat-form-field>
 
@@ -69,6 +94,12 @@
           *ngIf="questionForm.get('description')?.hasError('required')"
         >
           Este campo é obrigatório.
+        </mat-error>
+        <mat-error *ngIf="questionForm.get('description')?.hasError('minlength')">
+          O conteúdo deve ter pelo menos 10 caracteres
+        </mat-error>
+        <mat-error *ngIf="questionForm.get('description')?.hasError('maxlength')">
+          O conteúdo deve ter no máximo 1000 caracteres
         </mat-error>
         <button mat-button type="button" (click)="insertCodeSnippet()">
           Inserir Código

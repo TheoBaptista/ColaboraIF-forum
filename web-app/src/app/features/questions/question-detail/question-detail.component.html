@@ -26,7 +26,7 @@
     <h3>Respostas:</h3>
     <mat-card *ngFor="let answer of question?.answers" class="answer-card">
       <mat-card-content class="answer-card-content">
-        <div class="answer-card-info">
+        <div>
           <p><strong>Resposta:</strong></p><div [innerHTML]="processContent(answer.content)"></div>
           <p><strong>Usuário:</strong> {{ answer.username }}</p>
         </div>

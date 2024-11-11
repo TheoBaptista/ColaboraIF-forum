@@ -1,10 +1,10 @@
-package br.edu.ifrs.poa.forumapi;
+package br.edu.ifrs.poa.api_forum;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ForumApiApplicationTests {
+class ApiForumApplicationTests {
 
 	@Test
 	void contextLoads() {

@@ -16,6 +16,7 @@ import { Question } from '../../../core/models/question.model';
 import { Router } from '@angular/router';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthorizationService } from '../../../core/services/authorization.service';
+import { LineClampDirective } from '../../../shared/directives/line-clamp.directive';
 
 @Component({
   selector: 'app-question-form',
@@ -30,31 +31,30 @@ import { AuthorizationService } from '../../../core/services/authorization.servi
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    LineClampDirective
   ],
 })
 export class QuestionFormComponent {
   questionForm: FormGroup;
-
   user: any = null;
-
   categories: string[] = [];
-
   allTopics: string[] = [];
-  filteredTopics: string[] = []; 
+  filteredTopics: string[] = [];
+  suggestedQuestions: any[] = [];
   
   constructor(
     private fb: FormBuilder,
     private questionService: QuestionService,
-    private router: Router,
+    public router: Router,
     private snackBar: MatSnackBar,
     private authService: AuthorizationService
   ) {
     this.questionForm = this.fb.group({
-      title: ['', Validators.required],
-      category: ['', Validators.required],
-      topic: ['', Validators.required],
-      description: ['', Validators.required],
+      title: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
+      category: ['', [Validators.required]],
+      topic: ['', [Validators.required, Validators.maxLength(30)]],
+      description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(1000)]],
     });
 
     this.user = this.authService.getUserInfo();
@@ -80,15 +80,22 @@ export class QuestionFormComponent {
         });
       }
     });
+  }
 
-    this.questionService.getTopics().subscribe({
-      next: (topics: string[]) => {
-        this.allTopics = topics;
-      },
-      error: (err) => {
-        console.error('Erro ao carregar tópicos', err);
-      }
-    });
+  onTitleInput(event: any): void {
+    const title = event.target.value;
+    if (title.length >= 4) {
+      this.questionService.searchQuestions(title).subscribe({
+        next: (questions: any[]) => {
+          this.suggestedQuestions = questions;
+        },
+        error: (err) => {
+          console.error('Erro ao buscar perguntas sugeridas', err);
+        }
+      });
+    } else {
+      this.suggestedQuestions = [];
+    }
   }
 
   onTopicInput(event: any): void {
@@ -99,14 +106,23 @@ export class QuestionFormComponent {
         return; 
     }
 
-    this.filteredTopics = this.allTopics.filter(topic =>
-        topic.toLowerCase().includes(value.toLowerCase())
-    );
+    this.questionService.getTopics(value).subscribe({
+      next: (topics: string[]) => {
+          this.filteredTopics = topics;
+      },
+      error: (err) => {
+          console.error('Erro ao buscar tópicos semelhantes', err);
+      }
+  });
   }
 
   selectTopic(topic: string): void {
     this.questionForm.patchValue({ topic });
     this.filteredTopics = [];
+  }
+
+  viewQuestionDetails(id: string) {
+    this.router.navigate([`/question/${id}`]);
   }
 
   insertCodeSnippet() {

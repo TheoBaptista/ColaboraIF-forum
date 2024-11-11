@@ -109,6 +109,24 @@ mat-form-field {
   background-color: #b9c9c1 !important;
 }
 
+.category-dropdown-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+.category-dropdown {
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.no-results-message {
+  text-align: center;
+  margin-top: 20px;
+}
+
 @media (max-width: 768px) {
   .question-list {
     padding: 8px;

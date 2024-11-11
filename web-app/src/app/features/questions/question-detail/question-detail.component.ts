@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { QuestionService } from '../../../core/services/question.service';
 import { Answer, QuestionResponse } from '../../../core/models/question.model';
@@ -40,7 +40,8 @@ export class QuestionDetailComponent {
     private dialog: MatDialog,
     private authService: AuthorizationService,
     private router: Router,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private cdr: ChangeDetectorRef
   ) {
     this.user = this.authService.getUserInfo();
     if (!this.user) {
@@ -53,15 +54,7 @@ export class QuestionDetailComponent {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadFavoriteQuestions();
-
-      this.questionService.getQuestionById(id).subscribe({
-        next: (data: QuestionResponse) => {
-          this.question = data;
-        },
-        error: (err) => {
-          console.error('Erro ao carregar os detalhes da questão', err);
-        },
-      });
+      this.loadQuestionDetails(id);
     }
   }
 
@@ -70,11 +63,28 @@ export class QuestionDetailComponent {
       return '';
     }
   
-    const codeRegex = /```([\s\S]*?)```/g;
-    const sanitizedContent = content.replace(codeRegex, '<div class="code-container" style="background-color: #2e2e2e !important; max-width: 600px !important;   background-color: #2e2e2e !important; color: #ff7f50 !important; padding: 16px !important; border-radius: 4px !important; overflow-x: auto !important;"><pre><code>$1</code></pre></div>');
+    // Escape caracteres HTML especiais para evitar execução
+    const escapeHtml = (unsafe: string): string => {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    };
   
+    // Escape todo o conteúdo e formatar blocos de código markdown
+    let sanitizedContent = escapeHtml(content);
+  
+    // Formatar blocos de código markdown ` ```code``` `
+    const codeRegex = /```([\s\S]*?)```/g;
+    sanitizedContent = sanitizedContent.replace(codeRegex, 
+      '<div class="code-container" style="max-width: 100% !important; background-color: #2e2e2e !important; color: #ff7f50 !important; padding: 16px !important; border-radius: 4px !important; overflow-x: auto !important; box-sizing: border-box;  white-space: pre-wrap;"><pre><code>$1</code></pre></div>');
+  
+    // Retornar o conteúdo como HTML seguro
     return this.sanitizer.bypassSecurityTrustHtml(sanitizedContent);
   }
+
 
   loadFavoriteQuestions() {
     this.questionService
@@ -86,6 +96,17 @@ export class QuestionDetailComponent {
 
   isFavorite(questionId: string): boolean {
     return this.favoriteQuestions.includes(questionId);
+  }
+
+  loadQuestionDetails(id: string) {
+    this.questionService.getQuestionById(id).subscribe({
+      next: (data: QuestionResponse) => {
+        this.question = data;
+      },
+      error: (err) => {
+        console.error('Erro ao carregar os detalhes da questão', err);
+      },
+    });
   }
 
   toggleFavorite(questionId: string) {
@@ -138,11 +159,9 @@ export class QuestionDetailComponent {
 
     if (questionId) {
       this.questionService.addAnswer(questionId, newAnswer).subscribe({
-        next: (response) => {
-          if (this.question) {
-            this.question.answers.push(response);
-          }
-          this.newAnswerContent = '';
+        next: () => {
+          this.loadQuestionDetails(questionId); // Recarrega a pergunta
+          this.newAnswerContent = '';       
         },
         error: (err) => {
           console.error('Erro ao adicionar a resposta', err);

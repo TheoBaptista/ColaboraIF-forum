@@ -14,6 +14,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { QuestionService } from '../../../core/services/question.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { QuestionResponse } from '../../../core/models/question.model';
+import { Router } from '@angular/router';
+import { LineClampDirective } from '../../../shared/directives/line-clamp.directive';
 
 @Component({
   selector: 'app-user-advanced-search',
@@ -27,6 +30,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     MatSelectModule,
     MatButtonModule,
     MatCardModule,
+    LineClampDirective
   ],
   templateUrl: './user-advanced-search.component.html',
   styleUrl: './user-advanced-search.component.css',
@@ -34,8 +38,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class UserAdvancedSearchComponent {
   searchForm: FormGroup;
   categories: string[] = [];
+  questions: QuestionResponse[] | null = null;
 
-  constructor(private fb: FormBuilder, private questionService: QuestionService,  private snackBar: MatSnackBar) {
+  constructor(private fb: FormBuilder, private router: Router,private questionService: QuestionService,  private snackBar: MatSnackBar) {
     this.searchForm = this.fb.group({
       titleOrDescription: ['', [Validators.required, Validators.minLength(3)]], // Required validation
       topic: [''],
@@ -49,7 +54,7 @@ export class UserAdvancedSearchComponent {
     
     this.questionService.getCategories().subscribe({
       next: (data: string[]) => {
-        this.categories = ['Todas as categorias', ...data];
+        this.categories = ['Todas as Categorias', ...data];
       },
       error: (err) => {
         console.error('Erro ao carregar categorias', err);
@@ -67,11 +72,51 @@ export class UserAdvancedSearchComponent {
     return this.searchForm.valid;
   }
 
+  viewQuestionDetails(id: string) {
+    this.router.navigate([`/question/${id}`]);
+  }
+
+  initializeAnswers(questions: QuestionResponse[]): QuestionResponse[] {
+    return questions.map((question) => ({
+      ...question,
+      answers: question.answers ?? [],
+    }));
+  }
+
+  hasCorrectAnswer(question: any): boolean {
+    return question.answers.length > 0 && question.answers.some((answer: any) => answer.is_correct_answer);
+  }
+
   onSearch() {
     if (this.isValid()) {
-      console.log(this.searchForm.value);
+      const filters = this.searchForm.value;
+
+      if (filters.category === 'Todas as Categorias') {
+        filters.category = '';
+      }
+
+      this.questionService.advancedSearch(filters).subscribe({
+        next: (questions) => {
+          this.questions = questions;
+        },
+        error: (err) => {
+          console.error('Erro ao buscar perguntas', err);
+          this.questions = [];
+          if (err.status === 404) {
+            this.snackBar.open('Nenhuma pergunta encontrada.', 'Fechar', {
+              duration: 3000,
+            });
+          } else {
+            this.snackBar.open('Erro ao buscar perguntas.', 'Fechar', {
+              duration: 3000,
+            });
+          }
+        }
+      });
     } else {
-      console.log('Preencha pelo menos o título ou a descrição.');
+      this.snackBar.open('Preencha o título ou a descrição e a categoria.', 'Fechar', {
+        duration: 3000,
+      });
     }
   }
 }

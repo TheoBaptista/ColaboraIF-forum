@@ -10,25 +10,33 @@ export const authTokenInterceptor: HttpInterceptorFn = (req, next) => {
   const snackBar = inject(MatSnackBar); 
   const token = authService.getToken();
 
+  console.log("Authorization Token:", token);
+
   let clonedRequest = req;
+
   if (token && !req.url.endsWith('/api/login')) {
     clonedRequest = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`
       }
     });
+    console.log("Authorization Header Set:", clonedRequest.headers.get('Authorization'));
   }
 
   
   return next(clonedRequest).pipe(
     catchError((error) => {
-      if (error.status === 401) {
-        snackBar.open('Sua sessão expirou. Faça login novamente.', 'Fechar', {
+      if (error.status === 401 && !authService['logoutInProgress']) { 
+        const snackBarRef = snackBar.open('Sua sessão expirou. Faça login novamente.', 'Fechar', {
           duration: 3000,
           horizontalPosition: 'center',
           verticalPosition: 'top',
         });
         authService.logout();
+        
+        snackBarRef.afterDismissed().subscribe(() => {
+          window.location.reload();
+        });
       }
       return throwError(() => error);
     })

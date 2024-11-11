@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Answer, Question, QuestionResponse } from '../models/question.model';
 
@@ -30,14 +30,37 @@ export class QuestionService {
     );
   }
 
+  advancedSearch(filters: any): Observable<QuestionResponse[]> {
+    let params = new HttpParams();
+
+    // Adiciona os parâmetros de pesquisa se existirem
+    if (filters.titleOrDescription) {
+      params = params.set('titleOrDescription', filters.titleOrDescription);
+    }
+    if (filters.topic) {
+      params = params.set('topic', filters.topic);
+    }
+    if (filters.category) {
+      params = params.set('category', filters.category);
+    }
+    if (filters.hasAnswers !== '') {
+      params = params.set('hasAnswers', filters.hasAnswers);
+    }
+    if (filters.isSolved !== '') {
+      params = params.set('isSolved', filters.isSolved);
+    }
+
+    return this.http.get<QuestionResponse[]>(`${this.baseUrl}/questions/advanced-search`, { params });
+  }
+
   getUserQuestions(userId: string): Observable<QuestionResponse[]> {
     return this.http.get<QuestionResponse[]>(`${this.baseUrl}/user-questions`, {
       params: { userId },
     });
   }
 
-  deleteQuestion(id: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/questions/${id}`);
+  deleteQuestion(id: string, userId: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/questions/${id}/${userId}`);
   }
 
   updateQuestion(id: string, question: any) {
@@ -45,23 +68,29 @@ export class QuestionService {
   }
 
   getUserNotifications(userId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/notifications`, {
-      params: { userId },
-    });
+    return this.http.get<any[]>(`${this.baseUrl}/notifications/${userId}`);
   }
 
-  deleteNotification(notificationId: string): Observable<void> {
+  deleteNotification(userId: string, notificationId: string): Observable<void> {
     return this.http.delete<void>(
-      `${this.baseUrl}/notifications/${notificationId}`
+      `${this.baseUrl}/notifications/${userId}/${notificationId}`
     );
   }
 
-  addAnswer(questionId: string, answer: any): Observable<Answer> {
-    return this.http.post<Answer>(
+  addAnswer(questionId: string, answer: Answer): Observable<Answer> {
+    
+  const answerRequest = {
+    content: answer.content,
+    userId: answer.user_id,
+    username: answer.username,
+  };
+
+  return this.http.post<Answer>(
       `${this.baseUrl}/questions/${questionId}/answers`,
-      answer
+      answerRequest
     );
   }
+  
   markAnswerAsCorrect(questionId: string, answerId: string, userId: string) {
     return this.http.patch(`${this.baseUrl}/questions/${questionId}/answers/${answerId}/correct`, { userId });
   }
@@ -86,8 +115,8 @@ export class QuestionService {
     return this.http.get<string[]>(`${this.baseUrl}/categories`);
   }
 
-  getTopics(): Observable<any> {
-    return this.http.get<string[]>(`${this.baseUrl}/topics`);
+  getTopics(name: string): Observable<string[]> {
+    return this.http.get<string[]>(`${this.baseUrl}/topics/${name}`);
   }
 
 }

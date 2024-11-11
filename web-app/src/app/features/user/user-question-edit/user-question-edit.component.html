@@ -10,6 +10,15 @@
           formControlName="title"
           placeholder="Digite o título da sua pergunta"
         />
+        <mat-error *ngIf="questionForm.get('title')?.hasError('required')">
+          O título é obrigatório
+        </mat-error>
+        <mat-error *ngIf="questionForm.get('title')?.hasError('minlength')">
+          O título deve ter pelo menos 5 caracteres
+        </mat-error>
+        <mat-error *ngIf="questionForm.get('title')?.hasError('maxlength')">
+          O título deve ter no máximo 100 caracteres
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
@@ -19,6 +28,9 @@
             {{ category }}
           </mat-option>
         </mat-select>
+        <mat-error *ngIf="questionForm.get('category')?.hasError('required')">
+          A categoria é obrigatória
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
@@ -28,6 +40,12 @@
           formControlName="topic"
           placeholder="Digite o tópico relacionado"
         />
+        <mat-error *ngIf="questionForm.get('topic')?.hasError('required')">
+          O tópico é obrigatório
+        </mat-error>
+        <mat-error *ngIf="questionForm.get('topic')?.hasError('maxlength')">
+          O tópico deve ter no máximo 30 caracteres
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
@@ -38,8 +56,19 @@
           formControlName="content"
           placeholder="Digite a descrição relacionada"
         >
-      </textarea>
-      <button mat-button type="button" (click)="insertCodeSnippet()">Inserir Código</button>  
+        </textarea>
+        <button mat-button type="button" (click)="insertCodeSnippet()">
+          Inserir Código
+        </button>
+        <mat-error *ngIf="questionForm.get('content')?.hasError('required')">
+          O conteúdo é obrigatório
+        </mat-error>
+        <mat-error *ngIf="questionForm.get('content')?.hasError('minlength')">
+          O conteúdo deve ter pelo menos 10 caracteres
+        </mat-error>
+        <mat-error *ngIf="questionForm.get('content')?.hasError('maxlength')">
+          O conteúdo deve ter no máximo 1000 caracteres
+        </mat-error>
       </mat-form-field>
 
       <div class="botoes">

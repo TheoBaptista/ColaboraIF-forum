@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:5.0
+    container_name: mongodb-forum
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: forum-db
+    volumes:
+      - mongo_data:/data/db
+
+  redis:
+    image: redis:alpine
+    container_name: redis-auth
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  mongo_data:
+    driver: local
+  redis_data:
+    driver: local
