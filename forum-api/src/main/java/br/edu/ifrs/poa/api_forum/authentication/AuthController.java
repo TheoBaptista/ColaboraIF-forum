@@ -18,10 +18,19 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody @Valid  @NotNull LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid @NotNull LoginRequest loginRequest) {
         String idToken = loginRequest.idToken();
 
         val loginResponse = authService.authenticateUser(idToken);
+
+        return ResponseEntity.ok(loginResponse);
+    }
+
+
+    @PostMapping("/login/credentials")
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid @NotNull LoginCredentialsRequest loginCredentialsRequest) {
+
+        LoginResponse loginResponse = authService.authenticateCredentials(loginCredentialsRequest.username(), loginCredentialsRequest.password());
 
         return ResponseEntity.ok(loginResponse);
     }

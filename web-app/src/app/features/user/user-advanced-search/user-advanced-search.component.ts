@@ -14,7 +14,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { QuestionService } from '../../../core/services/question.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Question, QuestionResponse } from '../../../core/models/question.model';
+import { QuestionResponse } from '../../../core/models/question.model';
 import { Router } from '@angular/router';
 import { LineClampDirective } from '../../../shared/directives/line-clamp.directive';
 
@@ -54,7 +54,7 @@ export class UserAdvancedSearchComponent {
     
     this.questionService.getCategories().subscribe({
       next: (data: string[]) => {
-        this.categories = data;
+        this.categories = ['Todas as Categorias', ...data];
       },
       error: (err) => {
         console.error('Erro ao carregar categorias', err);
@@ -90,13 +90,18 @@ export class UserAdvancedSearchComponent {
   onSearch() {
     if (this.isValid()) {
       const filters = this.searchForm.value;
+
+      if (filters.category === 'Todas as Categorias') {
+        filters.category = '';
+      }
+
       this.questionService.advancedSearch(filters).subscribe({
         next: (questions) => {
           this.questions = questions;
         },
         error: (err) => {
           console.error('Erro ao buscar perguntas', err);
-          this.questions = null; // Limpa a lista de perguntas
+          this.questions = [];
           if (err.status === 404) {
             this.snackBar.open('Nenhuma pergunta encontrada.', 'Fechar', {
               duration: 3000,

@@ -88,7 +88,15 @@ export class UserQuestionsComponent implements OnInit {
   }
 
   deleteQuestion(questionId: string): void {
-    this.questionService.deleteQuestion(questionId).subscribe({
+
+    const user = this.authService.getUserInfo();
+
+    if (!user) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.questionService.deleteQuestion(questionId, user.id).subscribe({
       next: () => {
         this.questions = this.questions.filter((q) => q.id !== questionId);
         this.snackBar.open('Pergunta excluída com sucesso.', 'Fechar', {

@@ -50,10 +50,22 @@ export class UserQuestionEditComponent implements OnInit {
     private authService: AuthorizationService
   ) {
     this.questionForm = this.fb.group({
-      title: ['', Validators.required],
-      category: ['', Validators.required],
-      topic: ['', Validators.required],
-      content: ['', Validators.required],
+      title: [
+        '', 
+        [Validators.required, Validators.minLength(5), Validators.maxLength(100)]
+      ],
+      category: [
+        '', 
+        [Validators.required, Validators.maxLength(30)]
+      ],
+      topic: [
+        '', 
+        [Validators.required, Validators.maxLength(30)]
+      ],
+      content: [
+        '', 
+        [Validators.required, Validators.minLength(10), Validators.maxLength(1000)]
+      ],
     });
   }
 

@@ -59,8 +59,8 @@ export class QuestionService {
     });
   }
 
-  deleteQuestion(id: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/questions/${id}`);
+  deleteQuestion(id: string, userId: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/questions/${id}/${userId}`);
   }
 
   updateQuestion(id: string, question: any) {

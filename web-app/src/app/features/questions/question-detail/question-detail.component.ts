@@ -63,11 +63,28 @@ export class QuestionDetailComponent {
       return '';
     }
   
-    const codeRegex = /```([\s\S]*?)```/g;
-    const sanitizedContent = content.replace(codeRegex, '<div class="code-container" style="max-width: 100% !important; background-color: #2e2e2e !important; color: #ff7f50 !important; padding: 16px !important; border-radius: 4px !important; overflow-x: auto !important; box-sizing: border-box;  white-space: pre-wrap;"><pre><code>$1</code></pre></div>');
+    // Escape caracteres HTML especiais para evitar execução
+    const escapeHtml = (unsafe: string): string => {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    };
   
+    // Escape todo o conteúdo e formatar blocos de código markdown
+    let sanitizedContent = escapeHtml(content);
+  
+    // Formatar blocos de código markdown ` ```code``` `
+    const codeRegex = /```([\s\S]*?)```/g;
+    sanitizedContent = sanitizedContent.replace(codeRegex, 
+      '<div class="code-container" style="max-width: 100% !important; background-color: #2e2e2e !important; color: #ff7f50 !important; padding: 16px !important; border-radius: 4px !important; overflow-x: auto !important; box-sizing: border-box;  white-space: pre-wrap;"><pre><code>$1</code></pre></div>');
+  
+    // Retornar o conteúdo como HTML seguro
     return this.sanitizer.bypassSecurityTrustHtml(sanitizedContent);
   }
+
 
   loadFavoriteQuestions() {
     this.questionService

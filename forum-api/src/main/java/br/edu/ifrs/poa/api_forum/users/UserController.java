@@ -1,6 +1,5 @@
 package br.edu.ifrs.poa.api_forum.users;
 
-import br.edu.ifrs.poa.api_forum.questions.Question;
 import br.edu.ifrs.poa.api_forum.questions.QuestionResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,13 +27,6 @@ public class UserController {
         User user = userService.getUser(userId);
         return ResponseEntity.ok(user);
     }
-
-    @GetMapping("/user/all")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
-    }
-
 
     @PostMapping("/favorite-questions")
     public ResponseEntity<FavoriteQuestionResponse> addFavoriteQuestion(@RequestBody FavoriteQuestionRequest request) {

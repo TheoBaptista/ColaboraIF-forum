@@ -27,7 +27,7 @@ public class AuthenticationFilter implements Filter {
         String requestPath = httpRequest.getRequestURI();
 
 
-        if ("/api/login".equals(requestPath)) {
+        if ("/api/login".equals(requestPath) || "/api/login/credentials".equals(requestPath)) {
             chain.doFilter(request, response);
             return;
         }

@@ -4,6 +4,7 @@ import br.edu.ifrs.poa.api_forum.exception.ResourceNotFoundException;
 import br.edu.ifrs.poa.api_forum.notification.NotificationService;
 import br.edu.ifrs.poa.api_forum.questions.answers.Answer;
 import br.edu.ifrs.poa.api_forum.questions.answers.AnswerRequest;
+import br.edu.ifrs.poa.api_forum.questions.answers.AnswerResponse;
 import br.edu.ifrs.poa.api_forum.questions.cateogories.CategoryService;
 import br.edu.ifrs.poa.api_forum.questions.topics.TopicService;
 import br.edu.ifrs.poa.api_forum.users.UserService;
@@ -69,7 +70,7 @@ public class QuestionService {
         }
     }
 
-    public Question addQuestion(QuestionRequest questionRequest) {
+    public QuestionResponse addQuestion(QuestionRequest questionRequest) {
 
         if (!categoryService.existsCategory(questionRequest.category())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria inválida.");
@@ -91,21 +92,21 @@ public class QuestionService {
         topicService.addTopic(savedQuestion.getTopic());
 
 
-        return savedQuestion;
+        return new QuestionResponse(savedQuestion);
     }
 
-    public Question findById(String id) {
+    public QuestionResponse findById(String id) {
         val questionOptional = questionRepository.findById(id);
 
         if (questionOptional.isEmpty()) {
             throw new ResourceNotFoundException("Pergunta não encontrada.");
         }
 
-        return questionOptional.get();
+        return new QuestionResponse(questionOptional.get());
     }
 
-    public List<Question> getAllQuestions() {
-        return questionRepository.findAll();
+    public List<QuestionResponse> getAllQuestions() {
+        return questionRepository.findAll().stream().map(QuestionResponse::new).toList();
     }
 
     public QuestionResponse addAnswer(String questionId, AnswerRequest answerRequest) {
@@ -136,12 +137,13 @@ public class QuestionService {
         return new QuestionResponse(question);
     }
 
-    public List<Question> searchQuestions(String query) {
+    public List<QuestionResponse> searchQuestions(String query) {
         TextCriteria criteria = TextCriteria.forDefaultLanguage().matching(query);
-        return mongoTemplate.find(
+        List<Question> questions = mongoTemplate.find(
                 query(criteria),
                 Question.class
         );
+        return questions.stream().map(QuestionResponse::new).toList();
     }
 
     public List<QuestionResponse> advancedSearch(String titleOrDescription, String topic, String category, Boolean hasAnswers, Boolean isSolved) {
@@ -157,7 +159,9 @@ public class QuestionService {
             query.addCriteria(Criteria.where("topic").is(topic.toLowerCase().trim()));
         }
 
-        query.addCriteria(Criteria.where("category").is(category));
+        if (category != null && !category.isBlank()) {
+            query.addCriteria(Criteria.where("category").is(category));
+        }
 
         val questionList = mongoTemplate.find(query, Question.class);
 
@@ -165,24 +169,35 @@ public class QuestionService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nenhuma pergunta encontrada.");
         }
 
+        hasAnswersFilter(hasAnswers, questionList);
+
+        isSolvedFilter(isSolved, questionList);
+
         return questionList.stream().map(QuestionResponse::new).toList();
     }
 
-    // TODO: implementar deleção apenas do usúrio que criou a pergunta
-    public void deleteQuestion(String id) {
+    public void deleteQuestion(String id, String userId) {
         Optional<Question> questionOptional = questionRepository.findById(id);
+
+        userService.getUser(userId);
+
         if (questionOptional.isPresent()) {
+
             Question question = questionOptional.get();
+
+            validateOwnership(question.getUserId(), userId);
+
             if (question.getAnswers() != null && !question.getAnswers().isEmpty()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não é possível excluir uma pergunta que já possui respostas.");
             }
+
             questionRepository.deleteById(id);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pergunta não encontrada.");
         }
     }
 
-    public Question updateQuestion(String questionId, QuestionRequest questionRequest) {
+    public QuestionResponse updateQuestion(String questionId, QuestionRequest questionRequest) {
 
         userService.getUser(questionRequest.userId());
 
@@ -193,14 +208,14 @@ public class QuestionService {
         question.setContent(questionRequest.content());
         question.setTopic(questionRequest.topic());
         question.setCategory(questionRequest.category());
-        return questionRepository.save(question);
+
+        Question updatedQuestion = questionRepository.save(question);
+        return new QuestionResponse(updatedQuestion);
     }
 
-    public Optional<Answer> markAnswerAsCorrect(String questionId, String answerId, String userId) {
+    public AnswerResponse markAnswerAsCorrect(String questionId, String answerId, String userId) {
 
         userService.getUser(userId);
-
-
 
         Question question = findQuestionByIdOrThrow(questionId);
         validateOwnership(question.getUserId(), userId);
@@ -211,7 +226,35 @@ public class QuestionService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resposta não encontrada."));
         selectedAnswer.setCorrectAnswer(true);
 
-        return questionRepository.save(question).getAnswers().stream().filter(Answer::isCorrectAnswer).findFirst();
+        question.setSolved(true);
+
+        Optional<Answer> updatedAnswer = questionRepository.save(question).getAnswers().stream().filter(Answer::isCorrectAnswer).findFirst();
+
+        if (updatedAnswer.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Apenas o autor da pergunta pode marcar como correta");
+        }
+
+        return new AnswerResponse(updatedAnswer.get());
+    }
+
+    private void isSolvedFilter(Boolean isSolved, List<Question> questionList) {
+        if (isSolved != null) {
+            if (isSolved) {
+                questionList.removeIf(question -> !question.isSolved());
+            } else {
+                questionList.removeIf(Question::isSolved);
+            }
+        }
+    }
+
+    private void hasAnswersFilter(Boolean hasAnswers, List<Question> questionList) {
+        if (hasAnswers != null) {
+            if (hasAnswers){
+                questionList.removeIf(question -> question.getAnswers() == null || question.getAnswers().isEmpty());
+            }else{
+                questionList.removeIf(question -> question.getAnswers() != null && !question.getAnswers().isEmpty());
+            }
+        }
     }
 
     private void validateCategory(String category) {
@@ -222,7 +265,7 @@ public class QuestionService {
 
     private void validateOwnership(String ownerId, String userId) {
         if (!ownerId.equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Permissão negada: apenas o autor pode modificar a pergunta.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Permissão negada: apenas o autor pode modificar a pergunta.");
         }
     }
 

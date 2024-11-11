@@ -26,13 +26,17 @@ export const authTokenInterceptor: HttpInterceptorFn = (req, next) => {
   
   return next(clonedRequest).pipe(
     catchError((error) => {
-      if (error.status === 401) {
-        snackBar.open('Sua sessão expirou. Faça login novamente.', 'Fechar', {
+      if (error.status === 401 && !authService['logoutInProgress']) { 
+        const snackBarRef = snackBar.open('Sua sessão expirou. Faça login novamente.', 'Fechar', {
           duration: 3000,
           horizontalPosition: 'center',
           verticalPosition: 'top',
         });
         authService.logout();
+        
+        snackBarRef.afterDismissed().subscribe(() => {
+          window.location.reload();
+        });
       }
       return throwError(() => error);
     })

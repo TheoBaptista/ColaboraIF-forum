@@ -16,6 +16,7 @@ import { Question } from '../../../core/models/question.model';
 import { Router } from '@angular/router';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthorizationService } from '../../../core/services/authorization.service';
+import { LineClampDirective } from '../../../shared/directives/line-clamp.directive';
 
 @Component({
   selector: 'app-question-form',
@@ -30,7 +31,8 @@ import { AuthorizationService } from '../../../core/services/authorization.servi
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    LineClampDirective
   ],
 })
 export class QuestionFormComponent {
@@ -49,10 +51,10 @@ export class QuestionFormComponent {
     private authService: AuthorizationService
   ) {
     this.questionForm = this.fb.group({
-      title: ['', Validators.required],
-      category: ['', Validators.required],
-      topic: ['', Validators.required],
-      description: ['', Validators.required],
+      title: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
+      category: ['', [Validators.required]],
+      topic: ['', [Validators.required, Validators.maxLength(30)]],
+      description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(1000)]],
     });
 
     this.user = this.authService.getUserInfo();

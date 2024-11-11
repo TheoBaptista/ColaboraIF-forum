@@ -5,6 +5,7 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.web.util.HtmlUtils;
 
 import java.util.List;
 import java.util.Locale;
@@ -26,6 +27,7 @@ public class Question {
     private String category;
     private String userId;
     private String username;
+    private boolean isSolved;
     private List<Answer> answers;
 
 
@@ -37,5 +39,6 @@ public class Question {
         this.userId = userId;
         this.username = username;
         this.answers = answers;
+        this.isSolved = false;
     }
 }

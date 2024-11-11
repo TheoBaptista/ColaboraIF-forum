@@ -14,6 +14,7 @@ import { AuthorizationService } from '../../../core/services/authorization.servi
 })
 export class UserNotificationsComponent {
   notifications: any[] = [];
+  errorMessage: string | null = null;
 
   constructor(
     private questionService: QuestionService,
@@ -34,6 +35,12 @@ export class UserNotificationsComponent {
         this.notifications = data;
       },
       error: (error) => {
+        if (error.status === 404) {
+          this.errorMessage = 'Nenhuma notificação encontrada.';
+        }
+        if (error.status === 401) {
+          this.errorMessage = 'Sua sessão expirou. Por favor, logue novamente.';
+        }
         console.error('Erro ao buscar notificações:', error);
       }
     });

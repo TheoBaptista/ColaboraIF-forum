@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.ParseException;
+import java.util.Random;
 
 @Service
 public class AuthService {
@@ -53,6 +54,26 @@ public class AuthService {
         }
     }
 
+    public LoginResponse authenticateCredentials(String username, String password) {
+
+        if(!verifyCredentials(username, password)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Senha inválida");
+        }
+
+        Random random = new Random();
+        int randomNumber = 100 + random.nextInt(900);
+        String nickname = "testUser" + randomNumber;
+        String email = nickname + "@aluno.poa.ifrs.edu.br";
+
+        User user = findOrCreateUser(email, nickname);
+
+        var userInfo = new LoginResponse(jwtTokenUtil.generateToken(user.getId(), email), user.getName(), user.getEmail(), user.getId());
+
+        redisService.saveUserSession(userInfo.token(), userInfo.name(), userInfo.email());
+
+        return userInfo;
+    }
+
     public void logout(String token) {
         if (!token.startsWith("Bearer ")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token é obrigatório");
@@ -62,9 +83,13 @@ public class AuthService {
         redisService.deleteUserSession(token);
     }
 
+    private boolean verifyCredentials(String email, String password) {
+        return email.equals("userTestIFRS") && password.equals("teste@3214");
+    }
+
     private void validateEmailDomain(String email) {
         if (!email.endsWith("ifrs.edu.br")) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "E-mail não autorizado");
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "E-mail não autorizado");
         }
     }
 

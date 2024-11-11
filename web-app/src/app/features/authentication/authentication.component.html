@@ -28,6 +28,20 @@
         data-width="250"
       ></div>
     </div>
+
+    <form class="login-form" [formGroup]="loginForm">
+      <mat-form-field appearance="outline" class="login-input">
+        <mat-label>Usuário</mat-label>
+        <input matInput placeholder="Digite seu usuário" formControlName="username"/>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="login-input">
+        <mat-label>Senha</mat-label>
+        <input matInput placeholder="Digite sua senha" formControlName="password" type="password" />
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" class="login-button" (click)="loginWithCredentials()" [disabled]="loginForm.invalid">Entrar</button>
+    </form>
     
     <div *ngIf="errorMessage" class="error-message">
       {{ errorMessage }}
